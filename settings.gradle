@@ -1,0 +1,6 @@
+rootProject.name = 'template'
+
+include 'application'
+include 'common'
+include 'boundedContextA'
+include 'boundedContextB'

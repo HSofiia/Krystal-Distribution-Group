@@ -1,0 +1,9 @@
+server:
+  port: ${PORT:8092}
+  servlet:
+    context-path: /bcb
+
+
+spring:
+  config:
+    additional-location: ${SPRING_CONFIG_ADDITIONAL_LOCATION}

@@ -1,0 +1,10 @@
+plugins {
+    id 'module-config'
+    id 'spring-conventions'
+}
+
+dependencies {
+    implementation project(":common")
+    implementation project(':boundedContextA')
+    implementation project(':boundedContextB')
+}
