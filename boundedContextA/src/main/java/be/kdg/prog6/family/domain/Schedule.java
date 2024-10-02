@@ -1,51 +1,45 @@
 package be.kdg.prog6.family.domain;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.*;
 
 public class Schedule {
-    private UUID scheduleId;
-    private LocalDateTime scheduledTime;
-    private Truck truck;
-    private Material material;
+    private final UUID id;
+    private final LocalDateTime date;
+    private final Map<LocalDateTime, Appointment> scheduledAppointments;
+    private final int maxTrucksPerHour;
 
-    public Schedule(UUID scheduleId, LocalDateTime scheduledTime, Truck truck, Material material) {
-        this.scheduleId = scheduleId;
-        this.scheduledTime = scheduledTime;
-        this.truck = truck;
-        this.material = material;
+    public Schedule(UUID id, LocalDateTime date, Map<LocalDateTime, Appointment> scheduledAppointments, int maxTrucksPerHour) {
+        this.id = id;
+        this.date = date;
+        this.scheduledAppointments = scheduledAppointments;
+        this.maxTrucksPerHour = 1;
     }
 
-    public UUID getScheduleId() {
-        return scheduleId;
+    public Optional<Appointment> scheduleAppointment(Truck licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber) {
+        LocalDateTime currentHour = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0); // Get the current hour without minutes and seconds
+
+        // Check if there are already appointments for the current hour
+        if (scheduledAppointments.containsKey(currentHour)) {
+            return Optional.empty();  // No capacity left for this hour
+        }
+
+        // Create a new appointment and book the time slot
+        Appointment newAppointment = new Appointment(licensePlate, materialType, warehouseId, warehouseNumber, currentHour);
+        scheduledAppointments.put(currentHour, newAppointment);
+
+        return Optional.of(newAppointment);
     }
 
-    public void setScheduleId(UUID scheduleId) {
-        this.scheduleId = scheduleId;
+    public Collection<Appointment> getAppointments() {
+        return Collections.unmodifiableCollection(scheduledAppointments.values());
     }
 
-    public LocalDateTime getScheduledTime() {
-        return scheduledTime;
+    public UUID getId() {
+        return id;
     }
 
-    public void setScheduledTime(LocalDateTime scheduledTime) {
-        this.scheduledTime = scheduledTime;
-    }
-
-    public Truck getTruck() {
-        return truck;
-    }
-
-    public void setTruck(Truck truck) {
-        this.truck = truck;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(Material material) {
-        this.material = material;
+    public LocalDateTime getDate() {
+        return date;
     }
 }

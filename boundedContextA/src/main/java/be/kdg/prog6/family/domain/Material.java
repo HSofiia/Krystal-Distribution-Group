@@ -4,13 +4,16 @@ import java.util.UUID;
 
 public class Material {
     private UUID materialId;
-    private String name; // e.g., Petcoke, Gypsum
+    private MaterialType name; // e.g., Petcoke, Gypsum
     private double storageCostPerTon;
 
-    public Material(UUID materialId, String name, double storageCostPerTon) {
+    public Material(UUID materialId, MaterialType name, double storageCostPerTon) {
         this.materialId = materialId;
         this.name = name;
         this.storageCostPerTon = storageCostPerTon;
+    }
+
+    public Material(String materialName, String s) {
     }
 
     public UUID getMaterialId() {
@@ -21,11 +24,11 @@ public class Material {
         this.materialId = materialId;
     }
 
-    public String getName() {
+    public MaterialType getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(MaterialType name) {
         this.name = name;
     }
 

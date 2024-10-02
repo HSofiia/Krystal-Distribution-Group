@@ -1,52 +1,49 @@
 package be.kdg.prog6.family.domain;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Appointment {
-    private String id;
-    private LocalDateTime scheduledTime;
-    private Truck truck;
-    private Material material;
+    private final UUID id;
+    private final Truck licensePlate;
+    private final MaterialType materialType;
+    private final UUID warehouseId;
+    private final int warehouseNumber;
+    private final LocalDateTime scheduledTime;
     private AppointmentStatus status;
 
-    public Appointment(String id, LocalDateTime scheduledTime, Truck truck, Material material, AppointmentStatus status) {
-        this.id = id;
+    public Appointment(Truck licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime) {
+        this.id = UUID.randomUUID();
+        this.licensePlate = licensePlate;
+        this.materialType = materialType;
+        this.warehouseId = warehouseId;
+        this.warehouseNumber = warehouseNumber;
         this.scheduledTime = scheduledTime;
-        this.truck = truck;
-        this.material = material;
-        this.status = status;
+        this.status = AppointmentStatus.SCHEDULED;  // Default status as 'SCHEDULED'
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public Truck getLicensePlate() {
+        return licensePlate;
+    }
+
+    public MaterialType getMaterialType() {
+        return materialType;
+    }
+
+    public UUID getWarehouseId() {
+        return warehouseId;
+    }
+
+    public int getWarehouseNumber() {
+        return warehouseNumber;
     }
 
     public LocalDateTime getScheduledTime() {
         return scheduledTime;
-    }
-
-    public void setScheduledTime(LocalDateTime scheduledTime) {
-        this.scheduledTime = scheduledTime;
-    }
-
-    public Truck getTruck() {
-        return truck;
-    }
-
-    public void setTruck(Truck truck) {
-        this.truck = truck;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(Material material) {
-        this.material = material;
     }
 
     public AppointmentStatus getStatus() {

@@ -3,12 +3,12 @@
       image: mysql:9.0.1
       restart: no
       environment:
-        MYSQL_DATABASE: 'app_db'
-        MYSQL_USER: 'user'
+        MYSQL_DATABASE: 'kdg'
+        MYSQL_USER: 'kdg_user'
         MYSQL_PASSWORD: 'password'
         MYSQL_ROOT_PASSWORD: 'password'
       ports:
-        - '3306:3306'
+        - '33066:3306'
       networks:
         - backend
       volumes:

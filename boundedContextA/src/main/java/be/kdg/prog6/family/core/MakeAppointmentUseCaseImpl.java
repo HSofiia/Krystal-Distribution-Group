@@ -1,62 +1,59 @@
 package be.kdg.prog6.family.core;
 
-import be.kdg.prog6.family.domain.*;
+import be.kdg.prog6.family.domain.Appointment;
+import be.kdg.prog6.family.domain.Schedule;
+import be.kdg.prog6.family.domain.Warehouse;
 import be.kdg.prog6.family.port.in.MakeAppointmentCommand;
 import be.kdg.prog6.family.port.in.MakeAppointmentUseCase;
-import be.kdg.prog6.family.port.out.LoadMaterialPort;
-import be.kdg.prog6.family.port.out.LoadTruckPort;
+import be.kdg.prog6.family.port.out.AppointmentCreatedPort;
+import be.kdg.prog6.family.port.out.LoadSchedulePort;
 import be.kdg.prog6.family.port.out.LoadWarehousePort;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
-    private final LoadTruckPort loadTruckPort;
-    private final LoadMaterialPort loadMaterialPort;
-    private final LoadWarehousePort loadWarehousePort;
+    private final AppointmentCreatedPort appointmentCreatedPort;
+    private final LoadSchedulePort scheduleDetailsPort;
+    private final LoadWarehousePort warehousePort;
 
-    public MakeAppointmentUseCaseImpl(LoadTruckPort loadTruckPort, LoadMaterialPort loadMaterialPort, LoadWarehousePort loadWarehousePort) {
-        this.loadTruckPort = loadTruckPort;
-        this.loadMaterialPort = loadMaterialPort;
-        this.loadWarehousePort = loadWarehousePort;
+    public MakeAppointmentUseCaseImpl(AppointmentCreatedPort appointmentCreatedPort,
+                                      LoadSchedulePort scheduleDetailsPort,
+                                      LoadWarehousePort warehousePort) {
+        this.appointmentCreatedPort = appointmentCreatedPort;
+        this.scheduleDetailsPort = scheduleDetailsPort;
+        this.warehousePort = warehousePort;
     }
 
     @Override
-    @Transactional
-    public Appointment makeAppointment(MakeAppointmentCommand command) {
-        Truck truck = loadTruckPort.loadTruckByLicensePlate(command.truckLicensePlate())
-                .orElseThrow(() -> new IllegalArgumentException("Truck not found"));
+    public Optional<Appointment> makeAppointment(MakeAppointmentCommand createAppointmentCommand) {
+        // 1. Get warehouse information using the WarehouseInfoPort
+        Warehouse warehouse = warehousePort.getWarehouse(
+                createAppointmentCommand.sellerId(),
+                createAppointmentCommand.materialType());
 
-        // Load material details
-        Material material = loadMaterialPort.loadMaterialByName(command.materialName())
-                .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+        // 2. Load the schedule for the specific date using the ScheduleDetailsPort
+        Schedule schedule = scheduleDetailsPort.loadScheduleByDate(createAppointmentCommand.scheduledTime());
 
-        // Load warehouse details
-        Warehouse warehouse = loadWarehousePort.loadWarehouseById(command.warehouseId())
-                .orElseThrow(() -> new IllegalArgumentException("Warehouse not found"));
+        // 3. Schedule the appointment in the loaded schedule
+        Optional<Appointment> appointment = schedule.scheduleAppointment(
+                createAppointmentCommand.truckLicensePlate(),
+                createAppointmentCommand.materialType(),
+                warehouse.warehouseId(),
+                warehouse.warehouseNumber());
 
-        // Check if warehouse is below 80% capacity
-        if (!warehouse.isBelowEightyPercent()) {
-            throw new IllegalStateException("Warehouse is above 80% capacity, cannot make an appointment.");
+        // 4. Check if the warehouse is full or appointment could not be scheduled
+        if (!warehouse.isEnoughSpace() || appointment.isEmpty()) {
+            return Optional.empty();
         }
 
-        // Create and save the appointment
-        String weighbridgeNumber = UUID.randomUUID().toString();
-        Appointment appointment = new Appointment(
-                UUID.randomUUID().toString(),
-                command.scheduledTime(),
-                truck,
-                material,
-                weighbridgeNumber,
-                warehouse.getWarehouseId(),
-                AppointmentStatus.SCHEDULED
-        );
+        // 5. Save the new appointment using the AppointmentCreatedPort
+        Appointment newAppointment = appointment.get();
+        appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
 
-        saveAppointmentPort.save(appointment);
-
-        return appointment;
+        // 6. Return the newly created appointment
+        return Optional.of(newAppointment);
     }
 }
