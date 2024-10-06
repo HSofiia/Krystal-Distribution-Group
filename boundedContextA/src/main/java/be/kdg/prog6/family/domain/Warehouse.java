@@ -8,4 +8,6 @@ public record Warehouse(UUID warehouseId,
                         MaterialType materialType,
                         double capacity,
                         boolean isEnoughSpace,
-                        SellerId seller) { }
+                        SellerId seller) {
+
+}

@@ -2,15 +2,16 @@ package be.kdg.prog6.family.port.in;
 
 import be.kdg.prog6.family.domain.MaterialType;
 import be.kdg.prog6.family.domain.SellerId;
-import be.kdg.prog6.family.domain.Truck;
-import be.kdg.prog6.family.domain.Warehouse;
+import be.kdg.prog6.family.domain.TruckPlate;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.UUID;
 
-public record MakeAppointmentCommand(LocalDateTime scheduledTime, Truck truckLicensePlate, MaterialType materialType, Warehouse warehouseId, SellerId sellerId) {
+public record MakeAppointmentCommand(LocalDate scheduledTime, TruckPlate truckLicensePlate, MaterialType materialType, SellerId sellerId) {
     public MakeAppointmentCommand {
-        if (scheduledTime == null || truckLicensePlate == null || materialType == null || warehouseId == null) {
+        if (scheduledTime == null || truckLicensePlate == null || materialType == null || sellerId == null) {
             throw new IllegalArgumentException("All fields are required");
         }
     }
 }
+

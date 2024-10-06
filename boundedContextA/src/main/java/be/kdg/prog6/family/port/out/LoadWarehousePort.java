@@ -10,6 +10,5 @@ import java.util.UUID;
 @FunctionalInterface
 public interface LoadWarehousePort {
     Optional<Warehouse> loadWarehouseById(UUID warehouseId);
-    Warehouse getWarehouse(SellerId sellerId, MaterialType materialType);
-
+//    Warehouse getWarehouse(MaterialType materialType);
 }

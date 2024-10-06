@@ -56,5 +56,53 @@ public class WarehouseJpaEntity {
 
     public WarehouseJpaEntity() {
     }
+
+    public UUID getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(UUID warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public int getWarehouseNumber() {
+        return warehouseNumber;
+    }
+
+    public void setWarehouseNumber(int warehouseNumber) {
+        this.warehouseNumber = warehouseNumber;
+    }
+
+    public MaterialType getMaterialType() {
+        return materialType;
+    }
+
+    public void setMaterialType(MaterialType materialType) {
+        this.materialType = materialType;
+    }
+
+    public double getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(double capacity) {
+        this.capacity = capacity;
+    }
+
+    public boolean isBelowEightyPercent() {
+        return isBelowEightyPercent;
+    }
+
+    public void setBelowEightyPercent(boolean belowEightyPercent) {
+        isBelowEightyPercent = belowEightyPercent;
+    }
+
+    public UUID getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(UUID sellerId) {
+        this.sellerId = sellerId;
+    }
 }
 

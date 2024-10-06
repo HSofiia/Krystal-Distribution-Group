@@ -1,12 +1,10 @@
 package be.kdg.prog6.family.adapter.out.appointment;
 
+import be.kdg.prog6.family.adapter.out.schedule.ScheduleJpaEntity;
 import be.kdg.prog6.family.domain.AppointmentStatus;
 import be.kdg.prog6.family.domain.MaterialType;
-import be.kdg.prog6.family.domain.Truck;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import be.kdg.prog6.family.domain.Schedule;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -42,6 +40,10 @@ public class AppointmentJpaEntity {
     @Column(name = "scheduledTime")
     private LocalDateTime scheduledTime;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "scheduleId", nullable = false)
+    private ScheduleJpaEntity schedule;
+
     @Column(name = "status")
     private AppointmentStatus status;
 
@@ -56,5 +58,69 @@ public class AppointmentJpaEntity {
     }
 
     public AppointmentJpaEntity() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    public MaterialType getMaterialType() {
+        return materialType;
+    }
+
+    public void setMaterialType(MaterialType materialType) {
+        this.materialType = materialType;
+    }
+
+    public UUID getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(UUID warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public int getWarehouseNumber() {
+        return warehouseNumber;
+    }
+
+    public void setWarehouseNumber(int warehouseNumber) {
+        this.warehouseNumber = warehouseNumber;
+    }
+
+    public LocalDateTime getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(LocalDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
+    }
+
+    public ScheduleJpaEntity getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(ScheduleJpaEntity schedule) {
+        this.schedule = schedule;
+    }
+
+    public AppointmentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
     }
 }

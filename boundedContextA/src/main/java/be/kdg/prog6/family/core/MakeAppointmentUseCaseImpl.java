@@ -7,6 +7,7 @@ import be.kdg.prog6.family.port.in.MakeAppointmentCommand;
 import be.kdg.prog6.family.port.in.MakeAppointmentUseCase;
 import be.kdg.prog6.family.port.out.AppointmentCreatedPort;
 import be.kdg.prog6.family.port.out.LoadSchedulePort;
+import be.kdg.prog6.family.port.out.LoadWarehouseByMaterialTypePort;
 import be.kdg.prog6.family.port.out.LoadWarehousePort;
 import org.springframework.stereotype.Service;
 
@@ -18,23 +19,23 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
     private final AppointmentCreatedPort appointmentCreatedPort;
     private final LoadSchedulePort scheduleDetailsPort;
     private final LoadWarehousePort warehousePort;
+    private final LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort;
 
     public MakeAppointmentUseCaseImpl(AppointmentCreatedPort appointmentCreatedPort,
                                       LoadSchedulePort scheduleDetailsPort,
-                                      LoadWarehousePort warehousePort) {
+                                      LoadWarehousePort warehousePort, LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort) {
         this.appointmentCreatedPort = appointmentCreatedPort;
         this.scheduleDetailsPort = scheduleDetailsPort;
         this.warehousePort = warehousePort;
+        this.warehouseByMaterialTypePort = warehouseByMaterialTypePort;
     }
 
     @Override
     public Optional<Appointment> makeAppointment(MakeAppointmentCommand createAppointmentCommand) {
-        // 1. Get warehouse information using the WarehouseInfoPort
-        Warehouse warehouse = warehousePort.getWarehouse(
-                createAppointmentCommand.sellerId(),
+        // 1. Get warehouse information using the WarehousePort
+        Warehouse warehouse = warehouseByMaterialTypePort.getWarehouse(
                 createAppointmentCommand.materialType());
 
-        // 2. Load the schedule for the specific date using the ScheduleDetailsPort
         Schedule schedule = scheduleDetailsPort.loadScheduleByDate(createAppointmentCommand.scheduledTime());
 
         // 3. Schedule the appointment in the loaded schedule
@@ -47,13 +48,14 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
         // 4. Check if the warehouse is full or appointment could not be scheduled
         if (!warehouse.isEnoughSpace() || appointment.isEmpty()) {
             return Optional.empty();
+        }else {
+
+            // 5. Save the new appointment using the AppointmentCreatedPort
+            Appointment newAppointment = appointment.get();
+            appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
+
+            // 6. Return the newly created appointment
+            return Optional.of(newAppointment);
         }
-
-        // 5. Save the new appointment using the AppointmentCreatedPort
-        Appointment newAppointment = appointment.get();
-        appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
-
-        // 6. Return the newly created appointment
-        return Optional.of(newAppointment);
     }
 }

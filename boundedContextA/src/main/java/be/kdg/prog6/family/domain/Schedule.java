@@ -1,45 +1,61 @@
 package be.kdg.prog6.family.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 public class Schedule {
     private final UUID id;
-    private final LocalDateTime date;
-    private final Map<LocalDateTime, Appointment> scheduledAppointments;
+    private final LocalDate date;
+    private final List<Appointment> scheduledAppointments;
     private final int maxTrucksPerHour;
 
-    public Schedule(UUID id, LocalDateTime date, Map<LocalDateTime, Appointment> scheduledAppointments, int maxTrucksPerHour) {
+    public Schedule(UUID id, LocalDate date, List<Appointment> scheduledAppointments, int maxTrucksPerHour) {
         this.id = id;
         this.date = date;
         this.scheduledAppointments = scheduledAppointments;
         this.maxTrucksPerHour = 1;
     }
 
-    public Optional<Appointment> scheduleAppointment(Truck licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber) {
-        LocalDateTime currentHour = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0); // Get the current hour without minutes and seconds
-
-        // Check if there are already appointments for the current hour
-        if (scheduledAppointments.containsKey(currentHour)) {
-            return Optional.empty();  // No capacity left for this hour
-        }
-
-        // Create a new appointment and book the time slot
-        Appointment newAppointment = new Appointment(licensePlate, materialType, warehouseId, warehouseNumber, currentHour);
-        scheduledAppointments.put(currentHour, newAppointment);
-
-        return Optional.of(newAppointment);
+    public Optional<Appointment> scheduleAppointment(TruckPlate licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber) {
+       return findFirstAvailableHour().map(localDateTime -> new Appointment(licensePlate, materialType,warehouseId,warehouseNumber, localDateTime));
     }
 
-    public Collection<Appointment> getAppointments() {
-        return Collections.unmodifiableCollection(scheduledAppointments.values());
+    // Method to find the first available hour where trucks scheduled are less than maxTrucksPerHour
+    public Optional<LocalDateTime> findFirstAvailableHour() {
+        // Iterate through each hour of the day
+        for (int hour = 0; hour < 24; hour++) {
+            LocalDateTime startOfHour = date.atTime(LocalTime.of(hour, 0));  // Start of the current hour
+
+            // Count the number of trucks scheduled for this hour
+            long trucksScheduledThisHour = scheduledAppointments.stream()
+                    .filter(a -> isSameHour(a.getScheduledTime(), startOfHour))
+                    .count();
+
+            // If the number of trucks is less than maxTrucksPerHour, return this hour
+            if (trucksScheduledThisHour < maxTrucksPerHour) {
+                return Optional.of(startOfHour);
+            }
+        }
+
+        // If no available hour is found, return empty
+        return Optional.empty();
+    }
+
+    // Helper method to check if two times are within the same hour
+    private boolean isSameHour(LocalDateTime time1, LocalDateTime time2) {
+        return time1.getYear() == time2.getYear()
+                && time1.getMonth() == time2.getMonth()
+                && time1.getDayOfMonth() == time2.getDayOfMonth()
+                && time1.getHour() == time2.getHour();
     }
 
     public UUID getId() {
         return id;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 }

@@ -5,16 +5,16 @@ import java.util.UUID;
 
 public class Appointment {
     private final UUID id;
-    private final Truck licensePlate;
+    private final TruckPlate truck;
     private final MaterialType materialType;
     private final UUID warehouseId;
     private final int warehouseNumber;
     private final LocalDateTime scheduledTime;
     private AppointmentStatus status;
 
-    public Appointment(Truck licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime) {
+    public Appointment(TruckPlate licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime) {
         this.id = UUID.randomUUID();
-        this.licensePlate = licensePlate;
+        this.truck = licensePlate;
         this.materialType = materialType;
         this.warehouseId = warehouseId;
         this.warehouseNumber = warehouseNumber;
@@ -26,8 +26,8 @@ public class Appointment {
         return id;
     }
 
-    public Truck getLicensePlate() {
-        return licensePlate;
+    public TruckPlate getTruck() {
+        return truck;
     }
 
     public MaterialType getMaterialType() {

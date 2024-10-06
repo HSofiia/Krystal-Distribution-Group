@@ -5,5 +5,15 @@ server:
 
 
 spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+      show-sql: true
+  datasource:
+    url: "jdbc:mysql://localhost:3306/kdg"
+    username: kdg_user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
   config:
     additional-location: ${SPRING_CONFIG_ADDITIONAL_LOCATION}
