@@ -5,11 +5,13 @@ import be.kdg.prog6.family.domain.Appointment;
 import be.kdg.prog6.family.domain.Schedule;
 import be.kdg.prog6.family.domain.TruckPlate;
 import be.kdg.prog6.family.port.out.LoadSchedulePort;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,28 +22,38 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
         this.scheduleJpaRepository = scheduleJpaRepository;
     }
 
-
+    /**
+     * This method is transactional to ensure that the session remains open while the schedule
+     * and associated appointments are being loaded.
+     */
+    @Transactional // Keeps session open for appointments retrieval
     @Override
     public Schedule loadScheduleByDate(LocalDate date) {
-        return scheduleJpaRepository.findScheduleByDate(date)
-                .map(this::toSchedule)
-                .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        Optional<ScheduleJpaEntity> scheduleJpaEntityOpt = scheduleJpaRepository.findScheduleByDate(date);
+
+        if (scheduleJpaEntityOpt.isPresent()) {
+            ScheduleJpaEntity scheduleJpaEntity = scheduleJpaEntityOpt.get();
+
+            // Convert appointments from JPA to domain within the same transaction to avoid lazy initialization
+            List<Appointment> appointments = scheduleJpaEntity.getScheduledAppointments()
+                    .stream()
+                    .map(this::toDomainAppointment)
+                    .collect(Collectors.toList());
+
+            return new Schedule(
+                    scheduleJpaEntity.getId(),
+                    scheduleJpaEntity.getDate(),
+                    appointments,
+                    scheduleJpaEntity.getMaxTrucksPerHour()
+            );
+        } else {
+            throw new IllegalArgumentException("Schedule not found for the date: " + date);
+        }
     }
 
-    private Schedule toSchedule(final ScheduleJpaEntity scheduleJpaEntity){
-        List<Appointment> appointments = scheduleJpaEntity.getScheduledAppointments()
-                .stream()
-                .map(this::toDomainAppointment)
-                .collect(Collectors.toList());
-
-        return new Schedule(
-                scheduleJpaEntity.getId(),
-                scheduleJpaEntity.getDate(),
-                appointments,
-                scheduleJpaEntity.getMaxTrucksPerHour()
-        );
-    }
-
+    /**
+     * Converts the AppointmentJpaEntity to the domain Appointment object.
+     */
     private Appointment toDomainAppointment(final AppointmentJpaEntity entity) {
         return new Appointment(
                 new TruckPlate(entity.getLicensePlate()),

@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/appointments")
+@RequestMapping("/appointment")
 public class MakeAppointmentController {
 
     private final MakeAppointmentUseCase makeAppointmentUseCase;
@@ -40,6 +40,10 @@ public class MakeAppointmentController {
         // Call the use case to make the appointment
         Appointment appointment = makeAppointmentUseCase.makeAppointment(command)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to make the appointment"));
+
+        if (appointmentRequestDTO.getLicensePlate() == null || appointmentRequestDTO.getLicensePlate().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License plate is required");
+        }
         // Convert the domain appointment to a DTO
         AppointmentDto appointmentDTO = new AppointmentDto(
                 appointment.getScheduledTime(),

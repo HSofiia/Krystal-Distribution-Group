@@ -5,14 +5,19 @@ import be.kdg.prog6.family.domain.SellerId;
 import be.kdg.prog6.family.domain.Warehouse;
 import be.kdg.prog6.family.port.out.LoadWarehouseByMaterialTypePort;
 import be.kdg.prog6.family.port.out.LoadWarehousePort;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 @Component
 public class WarehouseDatabaseAdapter implements LoadWarehousePort, LoadWarehouseByMaterialTypePort {
     private final WarehouseJpaRepository warehouseJpaRepository;
+    private final Logger log = getLogger(WarehouseDatabaseAdapter.class);
+
 
     public WarehouseDatabaseAdapter(WarehouseJpaRepository warehouseJpaRepository) {
         this.warehouseJpaRepository = warehouseJpaRepository;
@@ -28,6 +33,7 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, LoadWarehous
     @Override
     public Warehouse getWarehouse(MaterialType materialType) {
         Optional<WarehouseJpaEntity> warehouseEntity = warehouseJpaRepository.findByMaterialType(materialType);
+        log.info("Looking for warehouse with material type: {}", materialType);
 
         return warehouseEntity.map(this::toWarehouse)
                 .orElseThrow(() -> new IllegalArgumentException("No warehouse found for material type: " + materialType));

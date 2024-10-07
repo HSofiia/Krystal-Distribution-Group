@@ -1,10 +1,7 @@
 package be.kdg.prog6.family.adapter.out.warehouse;
 
 import be.kdg.prog6.family.domain.MaterialType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -26,6 +23,7 @@ public class WarehouseJpaEntity {
     private int warehouseNumber;
 
     @Column(name = "materialType")
+    @Enumerated(value = EnumType.STRING)
     private MaterialType materialType;
 
     @Column(name = "currentCapacity")
@@ -37,7 +35,8 @@ public class WarehouseJpaEntity {
     @Column(name = "is_below_eighty_percent")
     private boolean isBelowEightyPercent;
 
-    @Column(name = "seller")
+    @Column(name = "seller", columnDefinition = "varchar(36)")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID sellerId;
 
     public WarehouseJpaEntity(UUID warehouseId, int warehouseNumber, MaterialType materialType, double capacity, boolean isBelowEightyPercent, UUID sellerId) {
