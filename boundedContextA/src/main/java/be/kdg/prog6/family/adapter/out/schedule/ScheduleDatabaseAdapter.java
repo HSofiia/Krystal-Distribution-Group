@@ -23,11 +23,12 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
 
     @Override
     public Schedule loadScheduleByDate(LocalDate date) {
-        return scheduleJpaRepository.findScheduleByDate(date).map(this::toSchedule).orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+        return scheduleJpaRepository.findScheduleByDate(date)
+                .map(this::toSchedule)
+                .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
     }
 
     private Schedule toSchedule(final ScheduleJpaEntity scheduleJpaEntity){
-
         List<Appointment> appointments = scheduleJpaEntity.getScheduledAppointments()
                 .stream()
                 .map(this::toDomainAppointment)
@@ -37,7 +38,8 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
                 scheduleJpaEntity.getId(),
                 scheduleJpaEntity.getDate(),
                 appointments,
-                scheduleJpaEntity.getMaxTrucksPerHour());
+                scheduleJpaEntity.getMaxTrucksPerHour()
+        );
     }
 
     private Appointment toDomainAppointment(final AppointmentJpaEntity entity) {

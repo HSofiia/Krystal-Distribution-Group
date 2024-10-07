@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "schedule")
-@Getter
-@Setter
+@Table(name = "schedule", catalog = "landside")
 public class ScheduleJpaEntity {
 
     @Id

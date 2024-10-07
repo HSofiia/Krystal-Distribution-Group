@@ -5,8 +5,6 @@ import be.kdg.prog6.family.domain.AppointmentStatus;
 import be.kdg.prog6.family.domain.MaterialType;
 import be.kdg.prog6.family.domain.Schedule;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -14,9 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "appointments")
-@Getter
-@Setter
+@Table(name = "appointments", catalog = "landside")
 public class AppointmentJpaEntity {
 
     @Id

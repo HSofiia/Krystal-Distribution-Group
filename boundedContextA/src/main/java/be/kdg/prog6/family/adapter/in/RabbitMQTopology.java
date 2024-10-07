@@ -13,11 +13,25 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQTopology {
 
-    public static final String EVENTS_CREATED = "events";
+    public static final String WAREHOUSE_EVENTS_EXCHANGE = "warehouse_events";
+    public static final String WAREHOUSE_STATUS_QUEUE = "warehouse_status";
 
     @Bean
-    TopicExchange warehouseEvents() {
-        return new TopicExchange(EVENTS_CREATED);
+    TopicExchange warehouseEventsExchange() {
+        return new TopicExchange(WAREHOUSE_EVENTS_EXCHANGE);
+    }
+
+    @Bean
+    Queue warehouseStatusQueue() {
+        return new Queue(WAREHOUSE_STATUS_QUEUE, true);
+    }
+
+    @Bean
+    Binding binding(TopicExchange exchange, Queue queue) {
+        return BindingBuilder
+                .bind(queue)
+                .to(exchange)
+                .with("warehouse.#.status.updated");
     }
 
     @Bean

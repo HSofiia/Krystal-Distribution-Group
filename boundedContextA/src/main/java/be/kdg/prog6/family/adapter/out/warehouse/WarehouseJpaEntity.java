@@ -13,7 +13,7 @@ import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 
 @Entity
-@Table(name = "warehouses")
+@Table(name = "warehouses", catalog = "landside")
 @Getter
 @Setter
 public class WarehouseJpaEntity {
@@ -28,8 +28,11 @@ public class WarehouseJpaEntity {
     @Column(name = "materialType")
     private MaterialType materialType;
 
-    @Column(name = "capacity")
-    private double capacity;
+    @Column(name = "currentCapacity")
+    private double currentCapacity;
+
+    @Column(name = "maxCapacity")
+    private double maxCapacity;
 
     @Column(name = "is_below_eighty_percent")
     private boolean isBelowEightyPercent;
@@ -41,7 +44,17 @@ public class WarehouseJpaEntity {
         this.warehouseId = warehouseId;
         this.warehouseNumber = warehouseNumber;
         this.materialType = materialType;
-        this.capacity = capacity;
+        this.currentCapacity = capacity;
+        this.isBelowEightyPercent = isBelowEightyPercent;
+        this.sellerId = sellerId;
+    }
+
+    public WarehouseJpaEntity(UUID warehouseId, int warehouseNumber, MaterialType materialType, double currentCapacity, double maxCapacity, boolean isBelowEightyPercent, UUID sellerId) {
+        this.warehouseId = warehouseId;
+        this.warehouseNumber = warehouseNumber;
+        this.materialType = materialType;
+        this.currentCapacity = currentCapacity;
+        this.maxCapacity = maxCapacity;
         this.isBelowEightyPercent = isBelowEightyPercent;
         this.sellerId = sellerId;
     }
@@ -50,7 +63,7 @@ public class WarehouseJpaEntity {
         this.warehouseId = warehouseId;
         this.warehouseNumber = warehouseNumber;
         this.materialType = materialType;
-        this.capacity = capacity;
+        this.currentCapacity = capacity;
         this.isBelowEightyPercent = isBelowEightyPercent;
     }
 
@@ -81,12 +94,12 @@ public class WarehouseJpaEntity {
         this.materialType = materialType;
     }
 
-    public double getCapacity() {
-        return capacity;
+    public double getCurrentCapacity() {
+        return currentCapacity;
     }
 
-    public void setCapacity(double capacity) {
-        this.capacity = capacity;
+    public void setCurrentCapacity(double currentCapacity) {
+        this.currentCapacity = currentCapacity;
     }
 
     public boolean isBelowEightyPercent() {
@@ -103,6 +116,14 @@ public class WarehouseJpaEntity {
 
     public void setSellerId(UUID sellerId) {
         this.sellerId = sellerId;
+    }
+
+    public double getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public void setMaxCapacity(double maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 }
 

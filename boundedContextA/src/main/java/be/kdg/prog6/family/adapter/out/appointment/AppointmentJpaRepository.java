@@ -6,8 +6,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface AppointmentJpaRepository extends JpaRepository<AppointmentJpaEntity, UUID> {
-    void saveAppointment(AppointmentJpaEntity appointment, UUID scheduleId);
-
     Optional<AppointmentJpaEntity> findAppointmentById(UUID appointmentId);
-
 }

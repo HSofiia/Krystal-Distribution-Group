@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "materials")
+@Table(name = "materials", catalog = "landside")
 public class MaterialJpaEntity {
     @Id
     @Column(name = "materialId", columnDefinition = "varchar(36)")

@@ -39,9 +39,10 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, LoadWarehous
                 warehouseJpaEntity.getWarehouseId(),
                 warehouseJpaEntity.getWarehouseNumber(),
                 warehouseJpaEntity.getMaterialType(),
-                warehouseJpaEntity.getCapacity(),
                 warehouseJpaEntity.isBelowEightyPercent(),
-                sellerId
-        );
+                sellerId,
+                warehouseJpaEntity.getCurrentCapacity(),
+                warehouseJpaEntity.getMaxCapacity()
+                );
     }
 }

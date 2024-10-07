@@ -11,7 +11,7 @@ spring:
       ddl-auto: create-drop
       show-sql: true
   datasource:
-    url: "jdbc:mysql://localhost:3306/kdg"
+    url: "jdbc:mysql://localhost:33066/kdg"
     username: kdg_user
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
