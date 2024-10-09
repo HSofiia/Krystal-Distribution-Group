@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,13 +48,33 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
                     scheduleJpaEntity.getMaxTrucksPerHour()
             );
         } else {
-            throw new IllegalArgumentException("Schedule not found for the date: " + date);
+            ScheduleJpaEntity newSchedule = new ScheduleJpaEntity();
+            newSchedule.setDate(date);
+            newSchedule.setMaxTrucksPerHour(newSchedule.getMaxTrucksPerHour()); // Define a default maxTrucksPerHour
+            scheduleJpaRepository.save(newSchedule);
+
+            // Return the newly created schedule mapped to the domain object
+            return toSchedule(newSchedule);
         }
     }
 
-    /**
-     * Converts the AppointmentJpaEntity to the domain Appointment object.
-     */
+
+    private Schedule toSchedule(final ScheduleJpaEntity scheduleJpaEntity) {
+        List<Appointment> appointments = (scheduleJpaEntity.getScheduledAppointments() != null)
+                ? scheduleJpaEntity.getScheduledAppointments()
+                .stream()
+                .map(this::toDomainAppointment)
+                .collect(Collectors.toList())
+                : new ArrayList<>();  // If null, return an empty list
+
+        return new Schedule(
+                scheduleJpaEntity.getId(),
+                scheduleJpaEntity.getDate(),
+                appointments,
+                scheduleJpaEntity.getMaxTrucksPerHour()
+        );
+    }
+
     private Appointment toDomainAppointment(final AppointmentJpaEntity entity) {
         return new Appointment(
                 new TruckPlate(entity.getLicensePlate()),

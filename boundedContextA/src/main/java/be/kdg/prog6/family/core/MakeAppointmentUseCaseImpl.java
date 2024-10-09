@@ -18,15 +18,13 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
     private final AppointmentCreatedPort appointmentCreatedPort;
     private final LoadSchedulePort scheduleDetailsPort;
-    private final LoadWarehousePort warehousePort;
+
     private final LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort;
 
     public MakeAppointmentUseCaseImpl(AppointmentCreatedPort appointmentCreatedPort,
-                                      LoadSchedulePort scheduleDetailsPort,
-                                      LoadWarehousePort warehousePort, LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort) {
+                                      LoadSchedulePort scheduleDetailsPort, LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort) {
         this.appointmentCreatedPort = appointmentCreatedPort;
         this.scheduleDetailsPort = scheduleDetailsPort;
-        this.warehousePort = warehousePort;
         this.warehouseByMaterialTypePort = warehouseByMaterialTypePort;
     }
 

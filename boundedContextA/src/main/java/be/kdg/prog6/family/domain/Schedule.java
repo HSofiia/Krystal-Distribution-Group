@@ -10,12 +10,13 @@ public class Schedule {
     private final LocalDate date;
     private final List<Appointment> scheduledAppointments;
     private final int maxTrucksPerHour;
+    private final int MAX_NM_TRUCKS = 5;
 
     public Schedule(UUID id, LocalDate date, List<Appointment> scheduledAppointments, int maxTrucksPerHour) {
         this.id = id;
         this.date = date;
         this.scheduledAppointments = scheduledAppointments;
-        this.maxTrucksPerHour = 1;
+        this.maxTrucksPerHour = MAX_NM_TRUCKS;
     }
 
     public Optional<Appointment> scheduleAppointment(TruckPlate licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber) {

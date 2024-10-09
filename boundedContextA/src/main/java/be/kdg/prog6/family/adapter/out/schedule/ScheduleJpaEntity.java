@@ -32,16 +32,12 @@ public class ScheduleJpaEntity {
     @Column(name = "maxTrucksPerHour")
     private int maxTrucksPerHour;
 
+    public ScheduleJpaEntity() {
+        this.id = UUID.randomUUID();
+    }
+
     public ScheduleJpaEntity(UUID id) {
         this.id = id;
-    }
-
-    public ScheduleJpaEntity() {
-    }
-
-    public ScheduleJpaEntity(UUID id, LocalDate date) {
-        this.id = id;
-        this.date = date;
     }
 
     public UUID getId() {

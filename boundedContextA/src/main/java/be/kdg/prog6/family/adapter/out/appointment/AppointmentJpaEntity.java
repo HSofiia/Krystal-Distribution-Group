@@ -24,6 +24,7 @@ public class AppointmentJpaEntity {
     private String licensePlate;
 
     @Column(name = "materialType")
+    @Enumerated(value = EnumType.STRING)
     private MaterialType materialType;
 
     @Column(name = "warehouseId", columnDefinition = "varchar(36)")
@@ -41,6 +42,7 @@ public class AppointmentJpaEntity {
     private ScheduleJpaEntity schedule;
 
     @Column(name = "status")
+    @Enumerated(value = EnumType.STRING)
     private AppointmentStatus status;
 
     public AppointmentJpaEntity(UUID id, String licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime, AppointmentStatus status) {
