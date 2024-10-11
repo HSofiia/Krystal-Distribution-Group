@@ -11,8 +11,5 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    implementation 'org.projectlombok:lombok'
-//    compileOnly 'org.projectlombok:lombok:1.18.28'
-//    annotationProcessor 'org.projectlombok:lombok:1.18.28'
 }
 
