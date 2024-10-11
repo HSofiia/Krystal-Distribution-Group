@@ -5,8 +5,8 @@ plugins {
 
 dependencies {
     implementation project(":common")
-    implementation project(':boundedContextA')
-    implementation project(':boundedContextB')
+    implementation project(':landside')
+    implementation project(':warehouse')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     runtimeOnly 'com.mysql:mysql-connector-j'
 }

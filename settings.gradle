@@ -1,6 +1,6 @@
-rootProject.name = 'template'
+rootProject.name = 'backend'
 
 include 'application'
 include 'common'
-include 'boundedContextA'
-include 'boundedContextB'
+include 'landside'
+include 'warehouse'
