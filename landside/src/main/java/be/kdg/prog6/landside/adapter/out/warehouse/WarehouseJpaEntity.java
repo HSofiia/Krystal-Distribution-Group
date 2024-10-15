@@ -65,6 +65,10 @@ public class WarehouseJpaEntity {
     public WarehouseJpaEntity() {
     }
 
+    public WarehouseJpaEntity(UUID warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
     public UUID getWarehouseId() {
         return warehouseId;
     }

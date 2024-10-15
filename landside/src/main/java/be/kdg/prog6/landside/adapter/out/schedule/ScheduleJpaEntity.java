@@ -6,6 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,13 +20,10 @@ public class ScheduleJpaEntity {
     private UUID id;
 
     @Column(name = "date")
-    private LocalDate date;
+    private LocalDateTime date;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AppointmentJpaEntity> scheduledAppointments;
-
-    @Column(name = "maxTrucksPerHour")
-    private int maxTrucksPerHour;
 
     public ScheduleJpaEntity() {
         this.id = UUID.randomUUID();
@@ -43,11 +41,11 @@ public class ScheduleJpaEntity {
         this.id = id;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
@@ -59,11 +57,4 @@ public class ScheduleJpaEntity {
         this.scheduledAppointments = scheduledAppointments;
     }
 
-    public int getMaxTrucksPerHour() {
-        return maxTrucksPerHour;
-    }
-
-    public void setMaxTrucksPerHour(int maxTrucksPerHour) {
-        this.maxTrucksPerHour = maxTrucksPerHour;
-    }
 }

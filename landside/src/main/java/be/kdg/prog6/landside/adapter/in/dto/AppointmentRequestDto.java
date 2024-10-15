@@ -1,11 +1,12 @@
 package be.kdg.prog6.landside.adapter.in.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class AppointmentRequestDto {
     private String licensePlate;
     private String materialType;
-    private LocalDate scheduleDateTime;
+    private LocalDateTime scheduleDateTime;
 
     // Getters and setters
     public String getLicensePlate() {
@@ -24,11 +25,11 @@ public class AppointmentRequestDto {
         this.materialType = materialType;
     }
 
-    public LocalDate getScheduleDateTime() {
+    public LocalDateTime getScheduleDateTime() {
         return scheduleDateTime;
     }
 
-    public void setScheduleDateTime(LocalDate scheduleDateTime) {
+    public void setScheduleDateTime(LocalDateTime scheduleDateTime) {
         this.scheduleDateTime = scheduleDateTime;
     }
 }

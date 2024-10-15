@@ -1,14 +1,14 @@
 package be.kdg.prog6.landside.adapter.out.schedule;
 
 import be.kdg.prog6.landside.adapter.out.appointment.AppointmentJpaEntity;
-import be.kdg.prog6.landside.domain.Appointment;
-import be.kdg.prog6.landside.domain.Schedule;
-import be.kdg.prog6.landside.domain.TruckPlate;
+import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivityJpaEntity;
+import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.out.LoadSchedulePort;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +22,9 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
         this.scheduleJpaRepository = scheduleJpaRepository;
     }
 
-    /**
-     * This method is transactional to ensure that the session remains open while the schedule
-     * and associated appointments are being loaded.
-     */
     @Transactional // Keeps session open for appointments retrieval
     @Override
-    public Schedule loadScheduleByDate(LocalDate date) {
+    public Schedule loadScheduleByDate(LocalDateTime date) {
         Optional<ScheduleJpaEntity> scheduleJpaEntityOpt = scheduleJpaRepository.findScheduleByDate(date);
 
         if (scheduleJpaEntityOpt.isPresent()) {
@@ -43,13 +39,10 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
             return new Schedule(
                     scheduleJpaEntity.getId(),
                     scheduleJpaEntity.getDate(),
-                    appointments,
-                    scheduleJpaEntity.getMaxTrucksPerHour()
-            );
+                    appointments);
         } else {
             ScheduleJpaEntity newSchedule = new ScheduleJpaEntity();
             newSchedule.setDate(date);
-            newSchedule.setMaxTrucksPerHour(newSchedule.getMaxTrucksPerHour()); // Define a default maxTrucksPerHour
             scheduleJpaRepository.save(newSchedule);
 
             // Return the newly created schedule mapped to the domain object
@@ -69,18 +62,42 @@ public class ScheduleDatabaseAdapter implements LoadSchedulePort {
         return new Schedule(
                 scheduleJpaEntity.getId(),
                 scheduleJpaEntity.getDate(),
-                appointments,
-                scheduleJpaEntity.getMaxTrucksPerHour()
+                appointments
         );
     }
 
     private Appointment toDomainAppointment(final AppointmentJpaEntity entity) {
+        List<Activity> activities = entity.getActivities()
+                .stream()
+                .map(this::toDomainActivity)  // Convert each JPA activity to a domain activity
+                .collect(Collectors.toList());
+        ActivityWindow activityWindow = new ActivityWindow(entity.getId(), activities);
+
         return new Appointment(
+                entity.getId(),
                 new TruckPlate(entity.getLicensePlate()),
                 entity.getMaterialType(),
                 entity.getWarehouseId(),
                 entity.getWarehouseNumber(),
-                entity.getScheduledTime()
+                entity.getScheduledTime(),
+                entity.getStatus(),
+                activityWindow
+        );
+    }
+
+    private Activity toDomainActivity(final AppointmentActivityJpaEntity entity) {
+        ActivityId activityId = new ActivityId(
+                entity.getId().getAppointmentId(),  // Assuming your composite ID has an appointment ID
+                entity.getId().getActivityId()      // Assuming your composite ID has an activity ID
+        );
+
+        return new Activity(
+                activityId,
+                entity.getActivityType(),
+                entity.getTime(),
+                entity.getStatus(),
+                entity.getWarehouseId().getWarehouseId(),
+                new TruckPlate(entity.getLicencePlate())  // Map the truck's license plate
         );
     }
 }

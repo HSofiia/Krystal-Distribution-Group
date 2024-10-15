@@ -15,14 +15,8 @@ import java.util.UUID;
 @Table(name = "appointmentActivity", catalog = "landside")
 public class AppointmentActivityJpaEntity {
 
-    @Id
-    @Column(name = "activityId", columnDefinition = "varchar(36)")
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    UUID id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "appointmentId", nullable = false)
-    AppointmentJpaEntity appointmentId;
+    @EmbeddedId
+    private AppointmentActivityIdJpaEntity id;
 
     @Column(name = "activityType")
     @Enumerated(value = EnumType.STRING)
@@ -42,9 +36,12 @@ public class AppointmentActivityJpaEntity {
     @Column(name = "licensePlate")
     String licencePlate;
 
-    public AppointmentActivityJpaEntity(UUID id, AppointmentJpaEntity appointmentId, ActivityType activityType, LocalDateTime time, AppointmentStatus status, WarehouseJpaEntity warehouseId, String licencePlate) {
+    @ManyToOne
+    @JoinColumn(name = "appointmentId", referencedColumnName = "appointmentId", insertable = false, updatable = false)
+    private AppointmentJpaEntity appointment;
+
+    public AppointmentActivityJpaEntity(AppointmentActivityIdJpaEntity id, ActivityType activityType, LocalDateTime time, AppointmentStatus status, WarehouseJpaEntity warehouseId, String licencePlate) {
         this.id = id;
-        this.appointmentId = appointmentId;
         this.activityType = activityType;
         this.time = time;
         this.status = status;
@@ -52,23 +49,19 @@ public class AppointmentActivityJpaEntity {
         this.licencePlate = licencePlate;
     }
 
-    public AppointmentActivityJpaEntity() {
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
+    public AppointmentActivityJpaEntity(AppointmentActivityIdJpaEntity id) {
         this.id = id;
     }
 
-    public AppointmentJpaEntity getAppointmentId() {
-        return appointmentId;
+    public AppointmentActivityJpaEntity() {
     }
 
-    public void setAppointmentId(AppointmentJpaEntity appointmentId) {
-        this.appointmentId = appointmentId;
+    public AppointmentActivityIdJpaEntity getId() {
+        return id;
+    }
+
+    public void setId(AppointmentActivityIdJpaEntity id) {
+        this.id = id;
     }
 
     public ActivityType getActivityType() {

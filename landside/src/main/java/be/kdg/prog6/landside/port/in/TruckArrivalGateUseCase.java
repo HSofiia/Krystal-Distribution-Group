@@ -5,6 +5,6 @@ import be.kdg.prog6.landside.domain.TruckArrival;
 import java.util.Optional;
 
 @FunctionalInterface
-public interface TruckOpenGateUseCase {
+public interface TruckArrivalGateUseCase {
     Optional<TruckArrival> openGate(TruckArrival arrival);
 }

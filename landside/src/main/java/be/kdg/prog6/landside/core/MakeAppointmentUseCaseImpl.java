@@ -1,30 +1,32 @@
 package be.kdg.prog6.landside.core;
 
-import be.kdg.prog6.landside.domain.Appointment;
-import be.kdg.prog6.landside.domain.Schedule;
-import be.kdg.prog6.landside.domain.Warehouse;
+import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.MakeAppointmentCommand;
 import be.kdg.prog6.landside.port.in.MakeAppointmentUseCase;
 import be.kdg.prog6.landside.port.out.AppointmentCreatedPort;
 import be.kdg.prog6.landside.port.out.LoadSchedulePort;
 import be.kdg.prog6.landside.port.out.LoadWarehouseByMaterialTypePort;
+import be.kdg.prog6.landside.port.out.UpdatedAppointmentPort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
     private final AppointmentCreatedPort appointmentCreatedPort;
     private final LoadSchedulePort scheduleDetailsPort;
-
     private final LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort;
+    private final List<UpdatedAppointmentPort> updatedAppointments;
 
     public MakeAppointmentUseCaseImpl(AppointmentCreatedPort appointmentCreatedPort,
-                                      LoadSchedulePort scheduleDetailsPort, LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort) {
+                                      LoadSchedulePort scheduleDetailsPort, LoadWarehouseByMaterialTypePort warehouseByMaterialTypePort, List<UpdatedAppointmentPort> updatedAppointments) {
         this.appointmentCreatedPort = appointmentCreatedPort;
         this.scheduleDetailsPort = scheduleDetailsPort;
         this.warehouseByMaterialTypePort = warehouseByMaterialTypePort;
+        this.updatedAppointments = updatedAppointments;
     }
 
     @Override
@@ -35,23 +37,36 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
         Schedule schedule = scheduleDetailsPort.loadScheduleByDate(createAppointmentCommand.scheduledTime());
 
-        // 3. Schedule the appointment in the loaded schedule
-        Optional<Appointment> appointment = schedule.scheduleAppointment(
-                createAppointmentCommand.truckLicensePlate(),
-                createAppointmentCommand.materialType(),
-                warehouse.warehouseId(),
-                warehouse.warehouseNumber());
-
-        // 4. Check if the warehouse is full or appointment could not be scheduled
-        if (!warehouse.isEnoughSpace() || appointment.isEmpty()) {
+        if (!warehouse.isEnoughSpace()) {
             return Optional.empty();
         }else {
+            Optional<Appointment> appointment = schedule.scheduleAppointment(
+                    createAppointmentCommand.truckLicensePlate(),
+                    createAppointmentCommand.materialType(),
+                    warehouse.warehouseId(),
+                    warehouse.warehouseNumber(),
+                    createAppointmentCommand.scheduledTime());
 
-            // 5. Save the new appointment using the AppointmentCreatedPort
+
+
             Appointment newAppointment = appointment.get();
             appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
 
-            // 6. Return the newly created appointment
+//             6. Create a new activity for this appointment
+            Activity newActivity = new Activity(
+                    new ActivityId(newAppointment.getId(), UUID.randomUUID()),
+                    ActivityType.SCHEDULED,
+                    createAppointmentCommand.scheduledTime(),
+                    AppointmentStatus.SCHEDULED,
+                    warehouse.warehouseId(),
+                    createAppointmentCommand.truckLicensePlate()
+            );
+
+            // 7. Notify all the updatedAppointment ports with the new appointment and activity
+            updatedAppointments.forEach(port -> {
+                port.activityCreated(newAppointment, newActivity);
+            });
+
             return Optional.of(newAppointment);
         }
     }

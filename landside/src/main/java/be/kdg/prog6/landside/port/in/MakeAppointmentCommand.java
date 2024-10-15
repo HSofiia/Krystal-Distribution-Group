@@ -5,8 +5,9 @@ import be.kdg.prog6.landside.domain.SellerId;
 import be.kdg.prog6.landside.domain.TruckPlate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public record MakeAppointmentCommand(LocalDate scheduledTime, TruckPlate truckLicensePlate, MaterialType materialType, SellerId sellerId) {
+public record MakeAppointmentCommand(LocalDateTime scheduledTime, TruckPlate truckLicensePlate, MaterialType materialType, SellerId sellerId) {
     public MakeAppointmentCommand {
         if (scheduledTime == null || truckLicensePlate == null || materialType == null || sellerId == null) {
             throw new IllegalArgumentException("All fields are required");

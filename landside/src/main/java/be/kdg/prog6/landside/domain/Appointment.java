@@ -11,15 +11,17 @@ public class Appointment {
     private final int warehouseNumber;
     private final LocalDateTime scheduledTime;
     private AppointmentStatus status;
+    private final ActivityWindow activityWindow;
 
-    public Appointment(TruckPlate licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime) {
-        this.id = UUID.randomUUID();
+    public Appointment(UUID id, TruckPlate licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime, AppointmentStatus status, ActivityWindow activityWindow) {
+        this.id = id;
         this.truck = licensePlate;
         this.materialType = materialType;
         this.warehouseId = warehouseId;
         this.warehouseNumber = warehouseNumber;
         this.scheduledTime = scheduledTime;
-        this.status = AppointmentStatus.SCHEDULED;  // Default status as 'SCHEDULED'
+        this.status = status;
+        this.activityWindow = activityWindow;
     }
 
     public UUID getId() {
@@ -52,5 +54,9 @@ public class Appointment {
 
     public void setStatus(AppointmentStatus status) {
         this.status = status;
+    }
+
+    public ActivityWindow getActivityWindow() {
+        return activityWindow;
     }
 }

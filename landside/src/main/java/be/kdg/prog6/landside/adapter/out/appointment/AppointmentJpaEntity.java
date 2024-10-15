@@ -1,5 +1,6 @@
 package be.kdg.prog6.landside.adapter.out.appointment;
 
+import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivityJpaEntity;
 import be.kdg.prog6.landside.adapter.out.schedule.ScheduleJpaEntity;
 import be.kdg.prog6.landside.domain.AppointmentStatus;
 import be.kdg.prog6.landside.domain.MaterialType;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -44,6 +46,10 @@ public class AppointmentJpaEntity {
     @Enumerated(value = EnumType.STRING)
     private AppointmentStatus status;
 
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL)
+    private List<AppointmentActivityJpaEntity> activities;
+
+
     public AppointmentJpaEntity(UUID id, String licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime, AppointmentStatus status) {
         this.id = id;
         this.licensePlate = licensePlate;
@@ -52,6 +58,18 @@ public class AppointmentJpaEntity {
         this.warehouseNumber = warehouseNumber;
         this.scheduledTime = scheduledTime;
         this.status = status;
+    }
+
+    public AppointmentJpaEntity(UUID id, String licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime, ScheduleJpaEntity schedule, AppointmentStatus status, List<AppointmentActivityJpaEntity> activities) {
+        this.id = id;
+        this.licensePlate = licensePlate;
+        this.materialType = materialType;
+        this.warehouseId = warehouseId;
+        this.warehouseNumber = warehouseNumber;
+        this.scheduledTime = scheduledTime;
+        this.schedule = schedule;
+        this.status = status;
+        this.activities = activities;
     }
 
     public AppointmentJpaEntity() {
@@ -119,5 +137,13 @@ public class AppointmentJpaEntity {
 
     public void setStatus(AppointmentStatus status) {
         this.status = status;
+    }
+
+    public List<AppointmentActivityJpaEntity> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<AppointmentActivityJpaEntity> activities) {
+        this.activities = activities;
     }
 }
