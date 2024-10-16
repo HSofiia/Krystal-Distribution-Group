@@ -1,8 +1,8 @@
 package be.kdg.prog6.landside.domain;
 
-import java.time.LocalDate;
+import be.kdg.prog6.common.domain.MaterialType;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 public class Schedule {

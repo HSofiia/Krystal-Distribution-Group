@@ -1,6 +1,6 @@
 package be.kdg.prog6.landside.adapter.out.warehouse;
 
-import be.kdg.prog6.landside.domain.MaterialType;
+import be.kdg.prog6.common.domain.MaterialType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;

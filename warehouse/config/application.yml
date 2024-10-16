@@ -5,5 +5,24 @@ server:
 
 
 spring:
+  jpa:
+    defer-datasource-initialization: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+      show-sql: true
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: "jdbc:mysql://localhost:33066/kdg"
+    username: kdg_user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: myuser
+    password: mypassword
   config:
     additional-location: ${SPRING_CONFIG_ADDITIONAL_LOCATION}

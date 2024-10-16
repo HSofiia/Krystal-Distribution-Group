@@ -39,31 +39,30 @@ public class TruckArrivalGateUseCaseImpl implements TruckArrivalGateUseCase {
             LocalDateTime scheduledTime = appointment.getScheduledTime();
             LocalDateTime truckArrivalTime = arrival.arrivalTime();
 
-            // Calculate the earliest and latest allowed times
-            LocalDateTime earliestAllowedTime = scheduledTime.minusMinutes(ALLOWED_TIME_WINDOW_MINUTES);  // Adjust for early arrivals
-            LocalDateTime latestAllowedTime = scheduledTime.plusMinutes(ALLOWED_TIME_WINDOW_MINUTES);     // Adjust for late arrivals
+            LocalDateTime earliestAllowedTime = scheduledTime;
+            LocalDateTime latestAllowedTime = scheduledTime.plusMinutes(ALLOWED_TIME_WINDOW_MINUTES);
 
             if (truckArrivalTime.isBefore(earliestAllowedTime)) {
-                // If the truck arrives early
                 log.info("Truck arrived early at: {}", truckArrivalTime);
-                return Optional.empty();  // Optionally, you could also return `Optional.of(arrival)` if you want to allow early arrivals
+                return Optional.empty();
+
             } else if (truckArrivalTime.isAfter(earliestAllowedTime) && truckArrivalTime.isBefore(latestAllowedTime)) {
-                // If the truck's arrival time is within the allowed window, open the gate
                 log.info("Truck arrived on time at: {}", truckArrivalTime);
                 Activity activity = new Activity(
                         new ActivityId(appointment.getId(), UUID.randomUUID()),
-                        ActivityType.ON_SITE,
+                        ActivityType.ARRIVED,
                         truckArrivalTime,
                         AppointmentStatus.SCHEDULED,
                         appointment.getWarehouseId(),
                         appointment.getTruck()
                 );
+
                 updatedAppointment.forEach(port -> port.activityCreated(appointment, activity));
                 return Optional.of(arrival);
             } else if (truckArrivalTime.isAfter(latestAllowedTime)) {
-                // If the truck is late
                 log.info("Truck arrived late at: {}", truckArrivalTime);
                 return Optional.empty();
+
             }
         } else {
             log.info("No appointment found for license plate: {}", arrival.plate().licensePlate());

@@ -1,10 +1,9 @@
 package be.kdg.prog6.landside.port.in;
 
-import be.kdg.prog6.landside.domain.MaterialType;
-import be.kdg.prog6.landside.domain.SellerId;
+import be.kdg.prog6.common.domain.MaterialType;
+import be.kdg.prog6.common.domain.SellerId;
 import be.kdg.prog6.landside.domain.TruckPlate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record MakeAppointmentCommand(LocalDateTime scheduledTime, TruckPlate truckLicensePlate, MaterialType materialType, SellerId sellerId) {

@@ -1,10 +1,12 @@
 package be.kdg.prog6.landside.domain;
 
+import be.kdg.prog6.common.domain.MaterialType;
+
 import java.util.UUID;
 
 public class Material {
     private UUID materialId;
-    private MaterialType name; // e.g., Petcoke, Gypsum
+    private MaterialType name;
     private double storageCostPerTon;
 
     public Material(UUID materialId, MaterialType name, double storageCostPerTon) {
@@ -13,8 +15,6 @@ public class Material {
         this.storageCostPerTon = storageCostPerTon;
     }
 
-    public Material(String materialName, String s) {
-    }
 
     public UUID getMaterialId() {
         return materialId;

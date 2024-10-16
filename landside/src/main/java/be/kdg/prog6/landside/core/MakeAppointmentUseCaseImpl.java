@@ -31,7 +31,6 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
     @Override
     public Optional<Appointment> makeAppointment(MakeAppointmentCommand createAppointmentCommand) {
-        // 1. Get warehouse information using the WarehousePort
         Warehouse warehouse = warehouseByMaterialTypePort.getWarehouse(
                 createAppointmentCommand.materialType());
 
@@ -52,7 +51,6 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
             Appointment newAppointment = appointment.get();
             appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
 
-//             6. Create a new activity for this appointment
             Activity newActivity = new Activity(
                     new ActivityId(newAppointment.getId(), UUID.randomUUID()),
                     ActivityType.SCHEDULED,
@@ -62,7 +60,6 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
                     createAppointmentCommand.truckLicensePlate()
             );
 
-            // 7. Notify all the updatedAppointment ports with the new appointment and activity
             updatedAppointments.forEach(port -> {
                 port.activityCreated(newAppointment, newActivity);
             });
