@@ -1,14 +1,15 @@
 package be.kdg.prog6.landside.adapter.out.appointment;
 
+import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivityIdJpaEntity;
 import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivityJpaEntity;
 import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivityJpaRepository;
 import be.kdg.prog6.landside.adapter.out.schedule.ScheduleJpaEntity;
-import be.kdg.prog6.landside.adapter.out.warehouse.WarehouseDatabaseAdapter;
 import be.kdg.prog6.landside.adapter.out.warehouse.WarehouseJpaEntity;
 import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.out.AppointmentCreatedPort;
 import be.kdg.prog6.landside.port.out.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.SaveAppointmentPort;
 import be.kdg.prog6.landside.port.out.UpdatedAppointmentPort;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
-public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadAppointmentPort, UpdatedAppointmentPort {
+public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadAppointmentPort, UpdatedAppointmentPort, SaveAppointmentPort {
 
     private final AppointmentJpaRepository appointmentJpaRepository;
     private final AppointmentActivityJpaRepository appointmentActivityJpaRepository; // Add this repository for activities
@@ -43,6 +44,20 @@ public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadA
         appointmentEntity.setSchedule(new ScheduleJpaEntity(scheduleId));
         appointmentJpaRepository.save(appointmentEntity);
         log.info("Appointment saved successfully with ID: {}", appointmentEntity.getId());
+    }
+
+    @Transactional
+    @Override
+    public void update(Appointment appointment) {
+        // Find the existing appointment by its ID
+        AppointmentJpaEntity appointmentEntity = appointmentJpaRepository.findById(appointment.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found with ID: " + appointment.getId()));
+
+        // Update the status of the appointment
+        appointmentEntity.setStatus(appointment.getStatus());
+
+        // Save the updated appointment back to the database
+        appointmentJpaRepository.save(appointmentEntity);
     }
 
     @Transactional

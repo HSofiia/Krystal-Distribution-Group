@@ -1,5 +1,6 @@
 package be.kdg.prog6.landside.adapter.out.schedule;
 
+import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.adapter.out.appointment.AppointmentJpaEntity;
 import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivityJpaEntity;
 import be.kdg.prog6.landside.domain.*;
@@ -7,7 +8,6 @@ import be.kdg.prog6.landside.port.out.LoadSchedulePort;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

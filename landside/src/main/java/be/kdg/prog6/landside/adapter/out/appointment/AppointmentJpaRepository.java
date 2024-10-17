@@ -1,6 +1,5 @@
 package be.kdg.prog6.landside.adapter.out.appointment;
 
-import be.kdg.prog6.landside.domain.TruckPlate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

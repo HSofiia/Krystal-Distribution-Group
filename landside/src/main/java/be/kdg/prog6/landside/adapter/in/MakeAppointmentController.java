@@ -5,7 +5,7 @@ import be.kdg.prog6.landside.adapter.in.dto.AppointmentRequestDto;
 import be.kdg.prog6.landside.domain.Appointment;
 import be.kdg.prog6.common.domain.MaterialType;
 import be.kdg.prog6.common.domain.SellerId;
-import be.kdg.prog6.landside.domain.TruckPlate;
+import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.port.in.MakeAppointmentCommand;
 import be.kdg.prog6.landside.port.in.MakeAppointmentUseCase;
 import org.springframework.http.HttpStatus;

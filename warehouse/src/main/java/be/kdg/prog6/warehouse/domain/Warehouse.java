@@ -10,7 +10,7 @@ public class Warehouse {
     int warehouseNumber;
     MaterialType materialType;
     SellerId seller;
-    double receivedAmount; // -25 ton, +30 ton
+    double amountReceived; // -25 ton, +30 ton
     double maxCapacity;
 
 }

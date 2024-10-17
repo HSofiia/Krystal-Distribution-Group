@@ -7,10 +7,12 @@ import java.time.LocalDateTime;
 public class TruckArrivalRequestDto {
     private String licensePlate;
     private LocalDateTime arrivalTime;
+    private int weighingBridgeNumber;
 
-    public TruckArrivalRequestDto(String licensePlate, LocalDateTime arrivalTime) {
+    public TruckArrivalRequestDto(String licensePlate, LocalDateTime arrivalTime, int weighingBridgeNumber) {
         this.licensePlate = licensePlate;
         this.arrivalTime = arrivalTime;
+        this.weighingBridgeNumber = weighingBridgeNumber;
     }
 
     // Getters and setters
@@ -30,10 +32,19 @@ public class TruckArrivalRequestDto {
         this.arrivalTime = arrivalTime;
     }
 
+    public int getWeighingBridgeNumber() {
+        return weighingBridgeNumber;
+    }
+
+    public void setWeighingBridgeNumber(int weighingBridgeNumber) {
+        this.weighingBridgeNumber = weighingBridgeNumber;
+    }
+
     public static TruckArrivalRequestDto of(TruckArrival truckArrival) {
         return new TruckArrivalRequestDto(
                 truckArrival.plate().licensePlate(),
-                truckArrival.arrivalTime()
+                truckArrival.arrivalTime(),
+                truckArrival.weighingBridgeNumber()
         );
     }
 }

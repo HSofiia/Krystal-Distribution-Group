@@ -3,6 +3,7 @@ package be.kdg.prog6.landside.core;
 import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.TruckArrivalGateUseCase;
 import be.kdg.prog6.landside.port.out.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.SaveAppointmentPort;
 import be.kdg.prog6.landside.port.out.UpdatedAppointmentPort;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,13 @@ public class TruckArrivalGateUseCaseImpl implements TruckArrivalGateUseCase {
     private final LoadAppointmentPort loadAppointmentPort;
     private final List<UpdatedAppointmentPort> updatedAppointment;
     private static final int ALLOWED_TIME_WINDOW_MINUTES = 60;
+    private final SaveAppointmentPort saveAppointmentPort;
     private final Logger log = getLogger(TruckArrivalGateUseCaseImpl.class);
 
-    public TruckArrivalGateUseCaseImpl(LoadAppointmentPort loadAppointmentPort, List<UpdatedAppointmentPort> updatedAppointment) {
+    public TruckArrivalGateUseCaseImpl(LoadAppointmentPort loadAppointmentPort, List<UpdatedAppointmentPort> updatedAppointment, SaveAppointmentPort saveAppointmentPort) {
         this.loadAppointmentPort = loadAppointmentPort;
         this.updatedAppointment = updatedAppointment;
+        this.saveAppointmentPort = saveAppointmentPort;
     }
 
     @Override
@@ -48,11 +51,13 @@ public class TruckArrivalGateUseCaseImpl implements TruckArrivalGateUseCase {
 
             } else if (truckArrivalTime.isAfter(earliestAllowedTime) && truckArrivalTime.isBefore(latestAllowedTime)) {
                 log.info("Truck arrived on time at: {}", truckArrivalTime);
+                appointment.setStatus(AppointmentStatus.ARRIVED_ON_TIME);
+                saveAppointmentPort.update(appointment);
                 Activity activity = new Activity(
                         new ActivityId(appointment.getId(), UUID.randomUUID()),
                         ActivityType.ARRIVED,
                         truckArrivalTime,
-                        AppointmentStatus.SCHEDULED,
+                        AppointmentStatus.ARRIVED_ON_TIME,
                         appointment.getWarehouseId(),
                         appointment.getTruck()
                 );
