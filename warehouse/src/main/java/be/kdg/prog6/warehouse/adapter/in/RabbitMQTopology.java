@@ -51,5 +51,4 @@ public class RabbitMQTopology {
         objectMapper.configure(DeserializationFeature.READ_ENUMS_USING_TO_STRING, true);
         return new Jackson2JsonMessageConverter(objectMapper);
     }
-
 }
