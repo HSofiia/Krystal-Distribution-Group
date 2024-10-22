@@ -2,9 +2,9 @@ package be.kdg.prog6.landside.core;
 
 import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.TruckArrivalGateUseCase;
-import be.kdg.prog6.landside.port.out.LoadAppointmentPort;
-import be.kdg.prog6.landside.port.out.SaveAppointmentPort;
-import be.kdg.prog6.landside.port.out.UpdatedAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.SaveAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +57,7 @@ public class TruckArrivalGateUseCaseImpl implements TruckArrivalGateUseCase {
                         new ActivityId(appointment.getId(), UUID.randomUUID()),
                         ActivityType.ARRIVED,
                         truckArrivalTime,
-                        AppointmentStatus.ARRIVED_ON_TIME,
+                        TruckStatus.ARRIVED,
                         appointment.getWarehouseId(),
                         appointment.getTruck()
                 );

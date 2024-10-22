@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQTopology {
 
     public static final String WAREHOUSE_EVENTS_EXCHANGE = "warehouse_events";
-    public static final String WAREHOUSE_STATUS_QUEUE = "warehouse_status";
+    public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received";
 
     @Bean
     TopicExchange warehouseEventsExchange() {
@@ -22,8 +22,8 @@ public class RabbitMQTopology {
     }
 
     @Bean
-    Queue warehouseStatusQueue() {
-        return new Queue(WAREHOUSE_STATUS_QUEUE, true);
+    Queue weightReceivedQueue() {
+        return new Queue(PAYLOAD_RECEIVED_QUEUE, true);
     }
 
     @Bean
@@ -31,7 +31,7 @@ public class RabbitMQTopology {
         return BindingBuilder
                 .bind(queue)
                 .to(exchange)
-                .with("warehouse.#.status.updated");
+                .with("warehouse.#.payload.received");
     }
 
     @Bean

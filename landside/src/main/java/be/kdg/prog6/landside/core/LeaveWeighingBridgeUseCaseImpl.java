@@ -1,19 +1,18 @@
 package be.kdg.prog6.landside.core;
 
 import be.kdg.prog6.common.domain.TruckPlate;
-import be.kdg.prog6.landside.domain.Appointment;
-import be.kdg.prog6.landside.domain.AppointmentStatus;
-import be.kdg.prog6.landside.domain.TruckWeight;
-import be.kdg.prog6.landside.port.in.ArriveWeighingBridgeUseCase;
+import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.LeaveWeighingBridgeUseCase;
 import be.kdg.prog6.landside.port.in.WeighingBridgeCommand;
-import be.kdg.prog6.landside.port.out.LoadAppointmentPort;
-import be.kdg.prog6.landside.port.out.LoadTruckWeightPort;
-import be.kdg.prog6.landside.port.out.SaveAppointmentPort;
-import be.kdg.prog6.landside.port.out.SaveTruckWeightPort;
+import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.SaveAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
+import be.kdg.prog6.landside.port.out.truck.LoadTruckWeightPort;
+import be.kdg.prog6.landside.port.out.truck.SaveTruckWeightPort;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,18 +25,20 @@ public class LeaveWeighingBridgeUseCaseImpl implements LeaveWeighingBridgeUseCas
     private final SaveTruckWeightPort saveTruckWeightPort;
     private final SaveAppointmentPort saveAppointmentPort;
     private final LoadTruckWeightPort loadTruckWeightPort;
+    private final List<UpdatedAppointmentPort> updatedAppointment;
     private final Logger log = getLogger(LeaveWeighingBridgeUseCaseImpl.class);
 
-    public LeaveWeighingBridgeUseCaseImpl(LoadAppointmentPort loadAppointmentPort, SaveTruckWeightPort saveTruckWeightPort, SaveAppointmentPort saveAppointmentPort, LoadTruckWeightPort loadTruckWeightPort) {
+    public LeaveWeighingBridgeUseCaseImpl(LoadAppointmentPort loadAppointmentPort, SaveTruckWeightPort saveTruckWeightPort, SaveAppointmentPort saveAppointmentPort, LoadTruckWeightPort loadTruckWeightPort, List<UpdatedAppointmentPort> updatedAppointment) {
         this.loadAppointmentPort = loadAppointmentPort;
         this.saveTruckWeightPort = saveTruckWeightPort;
         this.saveAppointmentPort = saveAppointmentPort;
         this.loadTruckWeightPort = loadTruckWeightPort;
+        this.updatedAppointment = updatedAppointment;
     }
 
 
     @Override
-    public TruckWeight leaveWeighingBridge(WeighingBridgeCommand command) {
+    public WBT leaveWeighingBridge(WeighingBridgeCommand command) {
         log.info("Processing truck arrival to weighing bridge for license plate: {}", command.licencePlate());
 
         Optional<Appointment> appointmentOpt = loadAppointmentPort.findAppointmentByLicencePlate(command.licencePlate());
@@ -54,7 +55,8 @@ public class LeaveWeighingBridgeUseCaseImpl implements LeaveWeighingBridgeUseCas
                 UUID.randomUUID(),
                 new TruckPlate(command.licencePlate()),
                 command.weight(),
-                command.time()
+                command.time(),
+                appointment.getWarehouseNumber()
         );
 
 //        if (appointment.getStatus() != AppointmentStatus.ARRIVED_ON_TIME) {
@@ -73,8 +75,25 @@ public class LeaveWeighingBridgeUseCaseImpl implements LeaveWeighingBridgeUseCas
         // Update the appointment status to ON_SITE after weighing
         appointment.setStatus(AppointmentStatus.COMPLETED);
         saveAppointmentPort.update(appointment);
+        Activity activity = new Activity(
+                new ActivityId(appointment.getId(), UUID.randomUUID()),
+                ActivityType.OUT_SITE,
+                initialTruckWeight.get().time(),
+                TruckStatus.OUT_SITE,
+                appointment.getWarehouseId(),
+                initialTruckWeight.get().licencePlate()
+        );
+
+        updatedAppointment.forEach(port -> port.activityCreated(appointment, activity));
         log.info("Appointment status updated to ARRIVED_ON_TIME for license plate: {}", leavingTruckWeight.licencePlate());
 
-        return leavingTruckWeight;
+        return new WBT(
+                leavingTruckWeight.licencePlate(),
+                initialTruckWeight.get().weight(),
+                leavingTruckWeight.weight(),
+                netWeight,
+                initialTruckWeight.get().time(),
+                leavingTruckWeight.time()
+                );
     }
 }

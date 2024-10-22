@@ -1,9 +1,6 @@
 package be.kdg.prog6.landside.adapter.out.truck;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -28,11 +25,15 @@ public class TruckWeightJpaEntity {
     @Column(name = "time")
     LocalDateTime time;
 
-    public TruckWeightJpaEntity(UUID id, String licencePlate, double weight, LocalDateTime time) {
+    @Transient
+    int warehouseNumber;
+
+    public TruckWeightJpaEntity(UUID id, String licencePlate, double weight, LocalDateTime time, int warehouseNumber) {
         this.id = id;
         this.licencePlate = licencePlate;
         this.weight = weight;
         this.time = time;
+        this.warehouseNumber = warehouseNumber;
     }
 
     public TruckWeightJpaEntity() {
@@ -68,5 +69,13 @@ public class TruckWeightJpaEntity {
 
     public void setTime(LocalDateTime time) {
         this.time = time;
+    }
+
+    public int getWarehouseNumber() {
+        return warehouseNumber;
+    }
+
+    public void setWarehouseNumber(int warehouseNumber) {
+        this.warehouseNumber = warehouseNumber;
     }
 }

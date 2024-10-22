@@ -12,12 +12,14 @@ public class TruckWeightDto{
     private String licencePlate;
     private double weight;
     private LocalDateTime time;
+    private int warehouseNumber;
 
-    public TruckWeightDto(UUID id, String licencePlate, double weight, LocalDateTime time) {
+    public TruckWeightDto(UUID id, String licencePlate, double weight, LocalDateTime time, int warehouseNumber) {
         this.id = id;
         this.licencePlate = licencePlate;
         this.weight = weight;
         this.time = time;
+        this.warehouseNumber = warehouseNumber;
     }
 
     public static TruckWeightDto of(TruckWeight truckWeight) {
@@ -25,7 +27,8 @@ public class TruckWeightDto{
                 UUID.randomUUID(),
                 truckWeight.licencePlate().licensePlate(),
                 truckWeight.weight(),
-                truckWeight.time()
+                truckWeight.time(),
+                truckWeight.warehouseNumber()
         );
     }
 
@@ -60,5 +63,13 @@ public class TruckWeightDto{
 
     public void setTime(LocalDateTime time) {
         this.time = time;
+    }
+
+    public int getWarehouseNumber() {
+        return warehouseNumber;
+    }
+
+    public void setWarehouseNumber(int warehouseNumber) {
+        this.warehouseNumber = warehouseNumber;
     }
 }

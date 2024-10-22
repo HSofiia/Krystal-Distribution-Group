@@ -7,10 +7,10 @@ import be.kdg.prog6.landside.adapter.out.appointmentActivity.AppointmentActivity
 import be.kdg.prog6.landside.adapter.out.schedule.ScheduleJpaEntity;
 import be.kdg.prog6.landside.adapter.out.warehouse.WarehouseJpaEntity;
 import be.kdg.prog6.landside.domain.*;
-import be.kdg.prog6.landside.port.out.AppointmentCreatedPort;
-import be.kdg.prog6.landside.port.out.LoadAppointmentPort;
-import be.kdg.prog6.landside.port.out.SaveAppointmentPort;
-import be.kdg.prog6.landside.port.out.UpdatedAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.AppointmentCreatedPort;
+import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.SaveAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
@@ -26,14 +26,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadAppointmentPort, UpdatedAppointmentPort, SaveAppointmentPort {
 
     private final AppointmentJpaRepository appointmentJpaRepository;
-    private final AppointmentActivityJpaRepository appointmentActivityJpaRepository; // Add this repository for activities
+    private final AppointmentActivityJpaRepository appointmentActivityJpaRepository;
     private final Logger log = getLogger(AppointmentDatabaseAdapter.class);
 
 
     public AppointmentDatabaseAdapter(final AppointmentJpaRepository appointmentJpaRepository,
                                       final AppointmentActivityJpaRepository appointmentActivityJpaRepository) {
         this.appointmentJpaRepository = appointmentJpaRepository;
-        this.appointmentActivityJpaRepository = appointmentActivityJpaRepository; // Initialize the activity repo
+        this.appointmentActivityJpaRepository = appointmentActivityJpaRepository;
     }
 
     @Transactional
@@ -49,14 +49,10 @@ public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadA
     @Transactional
     @Override
     public void update(Appointment appointment) {
-        // Find the existing appointment by its ID
         AppointmentJpaEntity appointmentEntity = appointmentJpaRepository.findById(appointment.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found with ID: " + appointment.getId()));
 
-        // Update the status of the appointment
         appointmentEntity.setStatus(appointment.getStatus());
-
-        // Save the updated appointment back to the database
         appointmentJpaRepository.save(appointmentEntity);
     }
 
@@ -72,7 +68,6 @@ public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadA
         appointmentJpaRepository.save(appointmentEntity);
         log.info("Activity saved successfully for appointment ID: {}", appointmentId);
     }
-
 
 
     private AppointmentActivityJpaEntity toAppointmentActivity(final AppointmentJpaEntity appointmentJpaEntity,

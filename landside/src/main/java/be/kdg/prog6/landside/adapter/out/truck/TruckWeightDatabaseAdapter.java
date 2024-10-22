@@ -2,13 +2,12 @@ package be.kdg.prog6.landside.adapter.out.truck;
 
 import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.domain.TruckWeight;
-import be.kdg.prog6.landside.port.out.LoadTruckWeightPort;
-import be.kdg.prog6.landside.port.out.SaveTruckWeightPort;
+import be.kdg.prog6.landside.port.out.truck.LoadTruckWeightPort;
+import be.kdg.prog6.landside.port.out.truck.SaveTruckWeightPort;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class TruckWeightDatabaseAdapter implements SaveTruckWeightPort, LoadTruckWeightPort {
@@ -42,7 +41,9 @@ public class TruckWeightDatabaseAdapter implements SaveTruckWeightPort, LoadTruc
                 truckWeightJpa.getId(),
                 new TruckPlate(truckWeightJpa.getLicencePlate()),
                 truckWeightJpa.getWeight(),
-                truckWeightJpa.getTime()
+                truckWeightJpa.getTime(),
+                truckWeightJpa.getWarehouseNumber()
+
         );
     }
 

@@ -3,6 +3,7 @@ package be.kdg.prog6.landside.adapter.in;
 import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.adapter.in.dto.TruckWeightDto;
 import be.kdg.prog6.landside.domain.TruckWeight;
+import be.kdg.prog6.landside.domain.WBT;
 import be.kdg.prog6.landside.port.in.ArriveWeighingBridgeUseCase;
 import be.kdg.prog6.landside.port.in.LeaveWeighingBridgeUseCase;
 import be.kdg.prog6.landside.port.in.WeighingBridgeCommand;
@@ -32,7 +33,8 @@ public class WeighingBridgeController {
         WeighingBridgeCommand command = new WeighingBridgeCommand(
                 truckWeightDto.getLicencePlate(),
                 truckWeightDto.getWeight(),
-                truckWeightDto.getTime()
+                truckWeightDto.getTime(),
+                truckWeightDto.getWarehouseNumber()
         );
 
 
@@ -41,18 +43,21 @@ public class WeighingBridgeController {
         return ResponseEntity.accepted().body(TruckWeightDto.of(result));
     }
 
-    @PostMapping("/leaving")
-    public ResponseEntity<TruckWeightDto> truckLeftWeight(@RequestBody TruckWeightDto truckWeightDto){
+    @PostMapping("/left")
+    public ResponseEntity<WBT> truckLeftWeight(@RequestBody TruckWeightDto truckWeightDto){
 
         WeighingBridgeCommand command = new WeighingBridgeCommand(
                 truckWeightDto.getLicencePlate(),
                 truckWeightDto.getWeight(),
-                truckWeightDto.getTime()
+                truckWeightDto.getTime(),
+                truckWeightDto.getWarehouseNumber()
         );
 
 
-        TruckWeight result = leaveWeighingBridgeUseCase.leaveWeighingBridge(command);
+        WBT result = leaveWeighingBridgeUseCase.leaveWeighingBridge(command);
 
-        return ResponseEntity.accepted().body(TruckWeightDto.of(result));
+        return ResponseEntity.accepted().body(result);
     }
 }
+// dumppayload appId warehouseId, timestamp and then send to warecontext to listen to this and create pdt
+// return in the end appointment id, netWeight

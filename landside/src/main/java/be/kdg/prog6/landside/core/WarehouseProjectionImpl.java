@@ -3,7 +3,7 @@ package be.kdg.prog6.landside.core;
 import be.kdg.prog6.landside.domain.Warehouse;
 import be.kdg.prog6.landside.port.in.WarehouseProjection;
 import be.kdg.prog6.landside.port.in.WarehouseProjectionCommand;
-import be.kdg.prog6.landside.port.out.LoadWarehousePort;
+import be.kdg.prog6.landside.port.out.warehouse.LoadWarehousePort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

@@ -4,10 +4,14 @@ import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.ArriveWeighingBridgeUseCase;
 import be.kdg.prog6.landside.port.in.WeighingBridgeCommand;
-import be.kdg.prog6.landside.port.out.*;
+import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.SaveAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
+import be.kdg.prog6.landside.port.out.truck.SaveTruckWeightPort;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,12 +23,14 @@ public class ArriveWeighingBridgeUseCaseImpl implements ArriveWeighingBridgeUseC
     private final LoadAppointmentPort loadAppointmentPort;
     private final SaveTruckWeightPort saveTruckWeightPort;
     private final SaveAppointmentPort saveAppointmentPort;
+    private final List<UpdatedAppointmentPort> updatedAppointment;
     private final Logger log = getLogger(ArriveWeighingBridgeUseCaseImpl.class);
 
-    public ArriveWeighingBridgeUseCaseImpl(LoadAppointmentPort loadAppointmentPort, SaveTruckWeightPort saveTruckWeightPort, SaveAppointmentPort saveAppointmentPort) {
+    public ArriveWeighingBridgeUseCaseImpl(LoadAppointmentPort loadAppointmentPort, SaveTruckWeightPort saveTruckWeightPort, SaveAppointmentPort saveAppointmentPort, List<UpdatedAppointmentPort> updatedAppointment) {
         this.loadAppointmentPort = loadAppointmentPort;
         this.saveTruckWeightPort = saveTruckWeightPort;
         this.saveAppointmentPort = saveAppointmentPort;
+        this.updatedAppointment = updatedAppointment;
     }
 
 
@@ -51,7 +57,8 @@ public class ArriveWeighingBridgeUseCaseImpl implements ArriveWeighingBridgeUseC
                 UUID.randomUUID(),
                 new TruckPlate(command.licencePlate()),
                 command.weight(),
-                command.time()
+                command.time(),
+                appointment.getWarehouseNumber()
         );
         saveTruckWeightPort.save(truckWeight);
         log.info("Truck weight saved for license plate: {}", command.licencePlate());
@@ -59,6 +66,17 @@ public class ArriveWeighingBridgeUseCaseImpl implements ArriveWeighingBridgeUseC
         // Update the appointment status to ON_SITE after weighing
         appointment.setStatus(AppointmentStatus.ARRIVED_ON_TIME);
         saveAppointmentPort.update(appointment);
+
+        Activity activity = new Activity(
+                new ActivityId(appointment.getId(), UUID.randomUUID()),
+                ActivityType.PASS_BRIDGE,
+                truckWeight.time(),
+                TruckStatus.ON_SITE,
+                appointment.getWarehouseId(),
+                truckWeight.licencePlate()
+        );
+
+        updatedAppointment.forEach(port -> port.activityCreated(appointment, activity));
         log.info("Appointment status updated to ARRIVED_ON_TIME for license plate: {}", command.licencePlate());
 
         return truckWeight;

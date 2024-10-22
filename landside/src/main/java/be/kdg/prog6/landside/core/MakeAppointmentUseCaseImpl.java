@@ -3,10 +3,10 @@ package be.kdg.prog6.landside.core;
 import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.MakeAppointmentCommand;
 import be.kdg.prog6.landside.port.in.MakeAppointmentUseCase;
-import be.kdg.prog6.landside.port.out.AppointmentCreatedPort;
+import be.kdg.prog6.landside.port.out.appointment.AppointmentCreatedPort;
 import be.kdg.prog6.landside.port.out.LoadSchedulePort;
-import be.kdg.prog6.landside.port.out.LoadWarehouseByMaterialTypePort;
-import be.kdg.prog6.landside.port.out.UpdatedAppointmentPort;
+import be.kdg.prog6.landside.port.out.warehouse.LoadWarehouseByMaterialTypePort;
+import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,7 +55,7 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
                     new ActivityId(newAppointment.getId(), UUID.randomUUID()),
                     ActivityType.SCHEDULED,
                     createAppointmentCommand.scheduledTime(),
-                    AppointmentStatus.SCHEDULED,
+                    TruckStatus.SCHEDULED,
                     warehouse.warehouseId(),
                     createAppointmentCommand.truckLicensePlate()
             );

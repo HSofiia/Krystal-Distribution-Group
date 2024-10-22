@@ -4,6 +4,7 @@ import be.kdg.prog6.landside.adapter.out.appointment.AppointmentJpaEntity;
 import be.kdg.prog6.landside.adapter.out.warehouse.WarehouseJpaEntity;
 import be.kdg.prog6.landside.domain.ActivityType;
 import be.kdg.prog6.landside.domain.AppointmentStatus;
+import be.kdg.prog6.landside.domain.TruckStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -25,9 +26,9 @@ public class AppointmentActivityJpaEntity {
     @Column(name = "time")
     LocalDateTime time;
 
-    @Column(name = "status")
+    @Column(name = "truckStatus")
     @Enumerated(value = EnumType.STRING)
-    AppointmentStatus status;
+    TruckStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "warehouseId", nullable = false)
@@ -40,7 +41,7 @@ public class AppointmentActivityJpaEntity {
     @JoinColumn(name = "appointmentId", referencedColumnName = "appointmentId", insertable = false, updatable = false)
     private AppointmentJpaEntity appointment;
 
-    public AppointmentActivityJpaEntity(AppointmentActivityIdJpaEntity id, ActivityType activityType, LocalDateTime time, AppointmentStatus status, WarehouseJpaEntity warehouseId, String licencePlate) {
+    public AppointmentActivityJpaEntity(AppointmentActivityIdJpaEntity id, ActivityType activityType, LocalDateTime time, TruckStatus status, WarehouseJpaEntity warehouseId, String licencePlate) {
         this.id = id;
         this.activityType = activityType;
         this.time = time;
@@ -80,11 +81,11 @@ public class AppointmentActivityJpaEntity {
         this.time = time;
     }
 
-    public AppointmentStatus getStatus() {
+    public TruckStatus getStatus() {
         return status;
     }
 
-    public void setStatus(AppointmentStatus status) {
+    public void setStatus(TruckStatus status) {
         this.status = status;
     }
 

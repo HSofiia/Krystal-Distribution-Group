@@ -3,8 +3,8 @@ package be.kdg.prog6.landside.adapter.out.warehouse;
 import be.kdg.prog6.common.domain.MaterialType;
 import be.kdg.prog6.common.domain.SellerId;
 import be.kdg.prog6.landside.domain.Warehouse;
-import be.kdg.prog6.landside.port.out.LoadWarehouseByMaterialTypePort;
-import be.kdg.prog6.landside.port.out.LoadWarehousePort;
+import be.kdg.prog6.landside.port.out.warehouse.LoadWarehouseByMaterialTypePort;
+import be.kdg.prog6.landside.port.out.warehouse.LoadWarehousePort;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
