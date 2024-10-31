@@ -16,12 +16,20 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQTopology {
 
-    public static final String WAREHOUSE_EVENTS_EXCHANGE = "warehouse_events";
+    public static final String LANDSIDE_EXCHANGE = "landside_events";
+    public static final String WAREHOUSE_CAPACITY_QUEUED = "warehouse_capacity_queue";
+
+
     public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received";
 
     @Bean
-    TopicExchange warehouseEventsExchange() {
-        return new TopicExchange(WAREHOUSE_EVENTS_EXCHANGE);
+    TopicExchange warehouseCapacityExchange() {
+        return new TopicExchange(LANDSIDE_EXCHANGE);
+    }
+
+    @Bean
+    Queue warehouseCapacityQueue() {
+        return new Queue(WAREHOUSE_CAPACITY_QUEUED, true);
     }
 
     @Bean
@@ -30,11 +38,19 @@ public class RabbitMQTopology {
     }
 
     @Bean
-    Binding binding(TopicExchange exchange, Queue queue) {
+    Binding bindingPayloadReceived(TopicExchange exchange, Queue weightReceivedQueue) {
         return BindingBuilder
-                .bind(queue)
+                .bind(weightReceivedQueue)
                 .to(exchange)
                 .with("warehouse.#.payload.received");
+    }
+
+    @Bean
+    Binding bindingCapacityChanged(TopicExchange warehouseCapacityExchange, Queue warehouseCapacityQueue) {
+        return BindingBuilder
+                .bind(warehouseCapacityQueue)
+                .to(warehouseCapacityExchange)
+                .with("warehouse.#.capacity.changed");
     }
 
     @Bean

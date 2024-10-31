@@ -1,11 +1,11 @@
 package be.kdg.prog6.warehouse.port.out;
 
 import be.kdg.prog6.warehouse.domain.Warehouse;
+import be.kdg.prog6.warehouse.domain.WarehouseReceive;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @FunctionalInterface
 public interface LoadWarehousePort {
-    Warehouse loadWarehouseById(UUID warehouseId);
+    Optional<Warehouse> loadWarehouseByNumber(int warehouseNumber);
 }

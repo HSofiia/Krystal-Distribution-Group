@@ -31,7 +31,7 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
     @Override
     public Optional<Appointment> makeAppointment(MakeAppointmentCommand createAppointmentCommand) {
-        Warehouse warehouse = warehouseByMaterialTypePort.getWarehouse(
+        WarehouseProjector warehouse = warehouseByMaterialTypePort.getWarehouse(
                 createAppointmentCommand.materialType());
 
         Schedule schedule = scheduleDetailsPort.loadScheduleByDate(createAppointmentCommand.scheduledTime());
@@ -42,8 +42,8 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
             Optional<Appointment> appointment = schedule.scheduleAppointment(
                     createAppointmentCommand.truckLicensePlate(),
                     createAppointmentCommand.materialType(),
-                    warehouse.warehouseId(),
-                    warehouse.warehouseNumber(),
+                    warehouse.getWarehouseId(),
+                    warehouse.getWarehouseNumber(),
                     createAppointmentCommand.scheduledTime());
 
 
@@ -56,7 +56,7 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
                     ActivityType.SCHEDULED,
                     createAppointmentCommand.scheduledTime(),
                     TruckStatus.SCHEDULED,
-                    warehouse.warehouseId(),
+                    warehouse.getWarehouseId(),
                     createAppointmentCommand.truckLicensePlate()
             );
 

@@ -9,5 +9,7 @@ import java.util.UUID;
 public interface WarehouseJpaRepository extends JpaRepository<WarehouseJpaEntity, UUID> {
     Optional<WarehouseJpaEntity> findByWarehouseId(UUID warehouseId);
 
+    Optional<WarehouseJpaEntity> findByWarehouseNumber(int warehouseNumber);
+
     Optional<WarehouseJpaEntity> findByMaterialType(MaterialType materialType);
 }

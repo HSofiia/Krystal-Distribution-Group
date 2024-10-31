@@ -1,0 +1,23 @@
+### Receive Payload
+POST http://localhost:15672/api/exchanges/%2F/amq.default/publish
+Authorization: Basic bXl1c2VyOm15cGFzc3dvcmQ=
+Content-Type: application/json
+
+{
+  "properties": {},
+  "routing_key": "payload_received",
+  "payload": "{\"warehouseNumber\":5,\"time\":\"2024-10-17T14:30:00\",\"netWeight\":50.0}",
+  "payload_encoding": "string"
+}
+
+### Warehouse Capacity Changed
+POST http://localhost:15672/api/exchanges/%2F/amq.default/publish
+Authorization: Basic bXl1c2VyOm15cGFzc3dvcmQ=
+Content-Type: application/json
+
+{
+  "properties": {},
+  "routing_key": "warehouse_capacity_queue",
+  "payload": "{\"warehouseNumber\":5,\"type\":\"DELIVERY\",\"amount\":50.0}",
+  "payload_encoding": "string"
+}

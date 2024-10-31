@@ -25,10 +25,10 @@ public class DumpPayloadEventPublisher implements ConveyorPayloadPort {
     }
 
     @Override
-    public void conveyorPayload(MaterialType materialType, int warehouseNumber, TruckPlate licencePlate, LocalDateTime time) {
+    public void conveyorPayload(MaterialType materialType, int warehouseNumber, TruckPlate licencePlate, LocalDateTime time, double netWeight) {
         log.info("publishing message about warehouse payload");
 
-        ConveyorPayloadEvent conveyorPayloadEvent = new ConveyorPayloadEvent(materialType, warehouseNumber, licencePlate, time);
+        ConveyorPayloadEvent conveyorPayloadEvent = new ConveyorPayloadEvent(materialType, warehouseNumber, licencePlate, time, netWeight);
         String routingKey = "warehouse.%s.weight.received".formatted(warehouseNumber);
 
         this.rabbitTemplate.convertAndSend(

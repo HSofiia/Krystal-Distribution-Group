@@ -1,10 +1,8 @@
 package be.kdg.prog6.landside.port.in;
 
-import be.kdg.prog6.landside.domain.Warehouse;
-
-import java.util.Optional;
+import be.kdg.prog6.common.domain.ActivityAmountType;
 
 @FunctionalInterface
 public interface WarehouseProjection {
-    Optional<Warehouse> warehouseProjection(WarehouseProjectionCommand warehouseCommand);
+    void warehouseProjection(int warehouseNumber, ActivityAmountType type, double amount);
 }
