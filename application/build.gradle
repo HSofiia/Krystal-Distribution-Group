@@ -8,5 +8,8 @@ dependencies {
     implementation project(':landside')
     implementation project(':warehouse')
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     runtimeOnly 'com.mysql:mysql-connector-j'
 }

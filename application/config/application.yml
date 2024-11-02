@@ -15,5 +15,16 @@ spring:
     username: kdg_user
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: myuser
+    password: mypassword
   config:
     additional-location: ${SPRING_CONFIG_ADDITIONAL_LOCATION}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8180/realms/kdg/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8180/realms/kdg

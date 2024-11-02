@@ -8,17 +8,22 @@ import be.kdg.prog6.common.domain.SellerId;
 import be.kdg.prog6.common.domain.TruckPlate;
 import be.kdg.prog6.landside.port.in.MakeAppointmentCommand;
 import be.kdg.prog6.landside.port.in.MakeAppointmentUseCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/appointment")
 public class MakeAppointmentController {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(MakeAppointmentController.class);
     private final MakeAppointmentUseCase makeAppointmentUseCase;
 
     public MakeAppointmentController(MakeAppointmentUseCase makeAppointmentUseCase) {
@@ -27,7 +32,12 @@ public class MakeAppointmentController {
 
     @PostMapping("/{customerId}")
     public ResponseEntity<AppointmentDto> makeAppointment(@RequestBody AppointmentRequestDto appointmentRequestDTO,
-                                             @PathVariable UUID customerId) {
+                                                          @PathVariable UUID customerId,
+                                                          @AuthenticationPrincipal Jwt jwt) {
+
+        if (jwt != null) {
+            LOGGER.info("{} is making appointment", jwt.getClaims().get("email"));
+        }
 
         MakeAppointmentCommand command = new MakeAppointmentCommand(
                 appointmentRequestDTO.getScheduleDateTime(),
