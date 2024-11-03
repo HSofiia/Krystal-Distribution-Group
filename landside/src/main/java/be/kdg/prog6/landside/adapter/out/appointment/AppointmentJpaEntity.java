@@ -60,16 +60,13 @@ public class AppointmentJpaEntity {
         this.status = status;
     }
 
-    public AppointmentJpaEntity(UUID id, String licensePlate, MaterialType materialType, UUID warehouseId, int warehouseNumber, LocalDateTime scheduledTime, ScheduleJpaEntity schedule, AppointmentStatus status, List<AppointmentActivityJpaEntity> activities) {
-        this.id = id;
+    public AppointmentJpaEntity(String licensePlate, MaterialType materialType, int warehouseNumber, LocalDateTime scheduledTime, ScheduleJpaEntity schedule, AppointmentStatus status) {
         this.licensePlate = licensePlate;
         this.materialType = materialType;
-        this.warehouseId = warehouseId;
         this.warehouseNumber = warehouseNumber;
         this.scheduledTime = scheduledTime;
         this.schedule = schedule;
         this.status = status;
-        this.activities = activities;
     }
 
     public AppointmentJpaEntity() {

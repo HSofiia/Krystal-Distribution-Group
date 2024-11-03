@@ -5,3 +5,4 @@ GRANT SHOW
     DATABASES ON *.* TO 'kdg_user'@'%';
 FLUSH
     PRIVILEGES;
+

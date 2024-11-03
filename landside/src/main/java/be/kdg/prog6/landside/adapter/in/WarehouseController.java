@@ -1,33 +1,23 @@
 //package be.kdg.prog6.landside.adapter.in;
 //
-//import be.kdg.prog6.landside.port.in.WarehouseProjection;
-//import be.kdg.prog6.landside.port.in.WarehouseProjectionCommand;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.amqp.rabbit.annotation.RabbitListener;
-//import org.springframework.stereotype.Component;
 //
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RestController;
 //
-//@Component
+//@RestController
+//@RequestMapping("/warehouse")
 //public class WarehouseController {
-//    private static final Logger LOGGER = LoggerFactory.getLogger(WarehouseController.class);
-//    private final WarehouseProjection warehouseUpdateProjection;
+//        private final WarehouseService warehouseService;
 //
-//    public WarehouseController(WarehouseProjection warehouseUpdateProjection) {
-//        this.warehouseUpdateProjection = warehouseUpdateProjection;
-//    }
+//        @Autowired
+//        public WarehouseController(WarehouseService warehouseService) {
+//            this.warehouseService = warehouseService;
+//        }
 //
-//    @RabbitListener(queues = "warehouse_status", messageConverter = "#{jackson2JsonMessageConverter}")
-//    void warehouseStatusUpdatedListener(WarehouseUpdatedEvent warehouseUpdatedEvent) {
-//        WarehouseProjectionCommand command = new WarehouseProjectionCommand(
-//                warehouseUpdatedEvent.warehouseId(),
-//                warehouseUpdatedEvent.isEnoughSpace()
-//        );
+//        @GetMapping("/overview")
+//        public ResponseEntity<WarehouseOverviewDto> getWarehouseOverview() {
+//            WarehouseOverviewDto overview = warehouseService.getWarehouseOverview();
+//            return ResponseEntity.ok(overview);
+//        }
 //
-//        LOGGER.info("The warehouse with id {} has enough space: {}",
-//                warehouseUpdatedEvent.warehouseId(),
-//                warehouseUpdatedEvent.isEnoughSpace());
-//
-//        warehouseUpdateProjection.warehouseProjection(command);
-//    }
 //}

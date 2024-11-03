@@ -40,5 +40,24 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:8090/api/give-money/08be00d6-988c-4095-9956-0e7793215824/20
+POST http://localhost:8091/bca/weighing-bridge/enter
 Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+    "licencePlate": "ABC123",
+    "weight": 60,
+    "time": "2024-10-11T11:26:59"
+}
+
+###
+
+POST http://localhost:8091/bca/weighing-bridge/left
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "licencePlate": "ABC123",
+  "weight": 23,
+  "time": "2024-10-11T12:40:59"
+}
