@@ -38,7 +38,7 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
 
         if (!warehouse.isEnoughSpace()) {
             return Optional.empty();
-        }else {
+        } else {
             Optional<Appointment> appointment = schedule.scheduleAppointment(
                     createAppointmentCommand.truckLicensePlate(),
                     createAppointmentCommand.materialType(),
@@ -46,19 +46,17 @@ public class MakeAppointmentUseCaseImpl implements MakeAppointmentUseCase {
                     warehouse.getWarehouseNumber(),
                     createAppointmentCommand.scheduledTime());
 
-
+            if (appointment.isEmpty()) return Optional.empty();
 
             Appointment newAppointment = appointment.get();
-            appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
 
-            Activity newActivity = new Activity(
-                    new ActivityId(newAppointment.getId(), UUID.randomUUID()),
+            Activity newActivity = newAppointment.addActivity(
                     ActivityType.SCHEDULED,
-                    createAppointmentCommand.scheduledTime(),
                     TruckStatus.SCHEDULED,
-                    warehouse.getWarehouseId(),
-                    createAppointmentCommand.truckLicensePlate()
+                    createAppointmentCommand.scheduledTime()
             );
+
+            appointmentCreatedPort.saveAppointment(newAppointment, schedule.getId());
 
             updatedAppointments.forEach(port -> {
                 port.activityCreated(newAppointment, newActivity);

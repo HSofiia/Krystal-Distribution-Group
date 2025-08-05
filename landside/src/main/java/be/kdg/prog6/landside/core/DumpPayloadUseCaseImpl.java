@@ -1,33 +1,48 @@
 package be.kdg.prog6.landside.core;
 
-import be.kdg.prog6.landside.domain.Appointment;
+import be.kdg.prog6.common.event.ConveyorPayloadEvent;
+import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.DumpPayloadCommand;
 import be.kdg.prog6.landside.port.in.DumpPayloadUseCase;
-import be.kdg.prog6.landside.port.out.ConveyorPayloadPort;
+import be.kdg.prog6.landside.port.out.CreatePdtPort;
 import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
+import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.logging.Logger;
 
 @Service
 public class DumpPayloadUseCaseImpl implements DumpPayloadUseCase {
 
-    private LoadAppointmentPort loadAppointmentPort;
-    private ConveyorPayloadPort conveyorPayloadPort;
+    private final LoadAppointmentPort loadAppointmentPort;
+    private final UpdatedAppointmentPort updatedAppointment;
+    private final CreatePdtPort createPdtPort;
+    private final Logger logger = Logger.getLogger(DumpPayloadUseCaseImpl.class.getName());
 
-
-    public DumpPayloadUseCaseImpl(LoadAppointmentPort loadAppointmentPort, ConveyorPayloadPort conveyorPayloadPort) {
+    public DumpPayloadUseCaseImpl(LoadAppointmentPort loadAppointmentPort, UpdatedAppointmentPort updatedAppointment, CreatePdtPort createPdtPort) {
         this.loadAppointmentPort = loadAppointmentPort;
-        this.conveyorPayloadPort = conveyorPayloadPort;
+        this.updatedAppointment = updatedAppointment;
+        this.createPdtPort = createPdtPort;
     }
 
     @Override
-    public void dumpPayloadOnConveyorBelt(DumpPayloadCommand command) {
-        Optional<Appointment> appointmentOpt = loadAppointmentPort.findAppointmentByLicencePlate(command.licencePlate().licensePlate());
+    @Transactional
+    public Appointment dumpPayloadOnConveyorBelt(DumpPayloadCommand command) {
+        Appointment appointment = loadAppointmentPort.findAppointmentByLicencePlateAndStatus(command.licencePlate().licensePlate(), AppointmentStatus.ON_SITE);
 
-        Appointment appointment = appointmentOpt.get();
-        double netWeight = 0.0;
+        Activity activity = appointment.addActivity(ActivityType.DUMP_LOAD, TruckStatus.ON_SITE, command.time());
+        updatedAppointment.activityCreated(appointment, activity);
+        createPdtPort.sendPdt(new ConveyorPayloadEvent(
+                appointment.getMaterialType().name(),
+                appointment.getWarehouseNumber(),
+                appointment.getTruck().licensePlate(),
+                LocalDateTime.now(),
+                0.0
+                ));
+                logger.info(String.format("Truck %s dumped material on conveyor belt.", command.licencePlate()));
 
-        conveyorPayloadPort.conveyorPayload(appointment.getMaterialType(), appointment.getWarehouseNumber(), appointment.getTruck(), command.time(), netWeight);
+        return appointment;
     }
 }

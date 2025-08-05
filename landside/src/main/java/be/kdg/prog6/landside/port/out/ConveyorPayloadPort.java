@@ -7,5 +7,5 @@ import be.kdg.prog6.landside.domain.Appointment;
 import java.time.LocalDateTime;
 
 public interface ConveyorPayloadPort {
-    void conveyorPayload(MaterialType materialType, int warehouseNumber, TruckPlate licencePlate, LocalDateTime time, double netWeight);
+//    void conveyorPayload(MaterialType materialType, int warehouseNumber, TruckPlate licencePlate, LocalDateTime time, double netWeight);
 }

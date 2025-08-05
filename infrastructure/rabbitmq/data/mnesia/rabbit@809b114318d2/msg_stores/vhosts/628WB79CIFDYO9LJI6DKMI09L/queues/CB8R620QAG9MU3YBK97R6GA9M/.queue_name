@@ -1,0 +1,2 @@
+VHOST: /
+QUEUE: payload_delivery_ticket_queue

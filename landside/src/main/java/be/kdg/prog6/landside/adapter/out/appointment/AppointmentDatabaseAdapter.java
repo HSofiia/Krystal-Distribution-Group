@@ -11,8 +11,10 @@ import be.kdg.prog6.landside.port.out.appointment.AppointmentCreatedPort;
 import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
 import be.kdg.prog6.landside.port.out.appointment.SaveAppointmentPort;
 import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -86,6 +88,16 @@ public class AppointmentDatabaseAdapter implements AppointmentCreatedPort, LoadA
     public Optional<Appointment> findAppointmentByLicencePlate(String licensePlate) {
         return appointmentJpaRepository.findLatestAppointmentByLicensePlate(licensePlate)
                 .map(this::toDomainAppointment);
+    }
+
+    @Override
+    public Appointment findAppointmentByLicencePlateAndStatus(String licensePlate, AppointmentStatus status) {
+        return appointmentJpaRepository
+                .findByLicensePlateAndStatusFetched(
+                        licensePlate,
+                        status)
+                .map(this::toDomainAppointment).orElseThrow(() -> new EntityNotFoundException(
+                        "Appointment for %s could not be found".formatted(licensePlate)));
     }
 
 

@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 
 @FunctionalInterface
 public interface DumpPayloadUseCase {
-    void dumpPayloadOnConveyorBelt(DumpPayloadCommand command);
+    Appointment dumpPayloadOnConveyorBelt(DumpPayloadCommand command);
 }

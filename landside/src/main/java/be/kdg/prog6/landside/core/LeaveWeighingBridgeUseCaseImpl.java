@@ -72,17 +72,13 @@ public class LeaveWeighingBridgeUseCaseImpl implements LeaveWeighingBridgeUseCas
         saveTruckWeightPort.save(leavingTruckWeight);
         log.info("Truck weight saved for license plate: {}", leavingTruckWeight.licencePlate());
 
-        // Update the appointment status to ON_SITE after weighing
+        Activity activity = appointment.addActivity(
+                ActivityType.OUT_SITE,
+                TruckStatus.OUT_SITE,
+                initialTruckWeight.get().time()
+        );
         appointment.setStatus(AppointmentStatus.COMPLETED);
         saveAppointmentPort.update(appointment);
-        Activity activity = new Activity(
-                new ActivityId(appointment.getId(), UUID.randomUUID()),
-                ActivityType.OUT_SITE,
-                initialTruckWeight.get().time(),
-                TruckStatus.OUT_SITE,
-                appointment.getWarehouseId(),
-                initialTruckWeight.get().licencePlate()
-        );
 
         updatedAppointment.forEach(port -> port.activityCreated(appointment, activity));
         log.info("Appointment status updated to ARRIVED_ON_TIME for license plate: {}", leavingTruckWeight.licencePlate());

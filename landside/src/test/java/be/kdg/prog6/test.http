@@ -1,0 +1,71 @@
+POST http://localhost:8180/realms/kdg/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = landside_client &
+client_secret = ToYvMNQKxFA1AXSdWZ4xIWRNVgkJ9HNV &
+username = developer &
+password = password &
+grant_type = password &
+scope = openid
+
+//saving the access token
+> {%
+    client.global.set("access_token", response.body.access_token);
+    console.log("Access Token:", client.global.get("access_token"));
+%}
+
+###
+
+
+POST http://localhost:8091/bca/appointment/3a9db4e9-e92b-4f9e-95fe-8e39fc1e8798
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "scheduleDateTime": "2024-11-05T11:20:00",
+  "licensePlate": "KDJ378",
+  "materialType": "CEMENT"
+}
+
+###
+
+POST http://localhost:8091/bca/open-gate/arrived
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "licensePlate": "KDJ378",
+  "arrivalTime": "2024-11-05T11:25:00"
+}
+
+###
+
+POST http://localhost:8091/bca/weighing-bridge/enter
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+    "licencePlate": "KDJ378",
+    "weight": 60,
+    "time": "2024-11-05T11:26:59"
+}
+
+### POST Test truck docking to conveyor belt to drop payload
+
+POST http://localhost:8091/bca/conveyorBelt/KDJ378
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{}
+
+###
+
+POST http://localhost:8091/bca/weighing-bridge/left
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "licencePlate": "KDJ378",
+  "weight": 23,
+  "time": "2024-11-05T12:40:59"
+}

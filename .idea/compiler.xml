@@ -7,4 +7,20 @@
       <module name="template.buildSrc.test" target="21" />
     </bytecodeTargetLevel>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="backend.application" options="-parameters" />
+      <module name="backend.application.main" options="-parameters" />
+      <module name="backend.application.test" options="-parameters" />
+      <module name="backend.common" options="-parameters" />
+      <module name="backend.common.main" options="-parameters" />
+      <module name="backend.common.test" options="-parameters" />
+      <module name="backend.landside" options="-parameters" />
+      <module name="backend.landside.main" options="-parameters" />
+      <module name="backend.landside.test" options="-parameters" />
+      <module name="backend.warehouse" options="-parameters" />
+      <module name="backend.warehouse.main" options="-parameters" />
+      <module name="backend.warehouse.test" options="-parameters" />
+    </option>
+  </component>
 </project>

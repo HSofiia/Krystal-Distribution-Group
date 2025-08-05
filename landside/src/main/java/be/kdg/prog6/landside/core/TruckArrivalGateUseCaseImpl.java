@@ -19,14 +19,14 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class TruckArrivalGateUseCaseImpl implements TruckArrivalGateUseCase {
 
     private final LoadAppointmentPort loadAppointmentPort;
-    private final List<UpdatedAppointmentPort> updatedAppointment;
+    private final List<UpdatedAppointmentPort> updatedAppointments;
     private static final int ALLOWED_TIME_WINDOW_MINUTES = 60;
     private final SaveAppointmentPort saveAppointmentPort;
     private final Logger log = getLogger(TruckArrivalGateUseCaseImpl.class);
 
-    public TruckArrivalGateUseCaseImpl(LoadAppointmentPort loadAppointmentPort, List<UpdatedAppointmentPort> updatedAppointment, SaveAppointmentPort saveAppointmentPort) {
+    public TruckArrivalGateUseCaseImpl(LoadAppointmentPort loadAppointmentPort, List<UpdatedAppointmentPort> updatedAppointments, SaveAppointmentPort saveAppointmentPort) {
         this.loadAppointmentPort = loadAppointmentPort;
-        this.updatedAppointment = updatedAppointment;
+        this.updatedAppointments = updatedAppointments;
         this.saveAppointmentPort = saveAppointmentPort;
     }
 
@@ -51,18 +51,15 @@ public class TruckArrivalGateUseCaseImpl implements TruckArrivalGateUseCase {
 
             } else if (truckArrivalTime.isAfter(earliestAllowedTime) && truckArrivalTime.isBefore(latestAllowedTime)) {
                 log.info("Truck arrived on time at: {}", truckArrivalTime);
-                appointment.setStatus(AppointmentStatus.ARRIVED_ON_TIME);
-                saveAppointmentPort.update(appointment);
-                Activity activity = new Activity(
-                        new ActivityId(appointment.getId(), UUID.randomUUID()),
+                Activity activity = appointment.addActivity(
                         ActivityType.ARRIVED,
-                        truckArrivalTime,
                         TruckStatus.ARRIVED,
-                        appointment.getWarehouseId(),
-                        appointment.getTruck()
+                        truckArrivalTime
                 );
 
-                updatedAppointment.forEach(port -> port.activityCreated(appointment, activity));
+                saveAppointmentPort.update(appointment);
+
+                updatedAppointments.forEach(port -> port.activityCreated(appointment, activity));
                 return Optional.of(arrival);
             } else if (truckArrivalTime.isAfter(latestAllowedTime)) {
                 log.info("Truck arrived late at: {}", truckArrivalTime);
