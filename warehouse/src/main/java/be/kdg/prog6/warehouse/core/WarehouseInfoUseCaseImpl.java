@@ -15,11 +15,11 @@
 //
 //    @Override
 //    public WarehouseActivity warehouseInfo(int warehouseNumber) {
-//        Warehouse warehouse = loadWarehousePort.loadWarehouseByNumber(warehouseNumber).orElseThrow();
+//        Warehouse warehouse = loadWarehousePort.loadWarehouseByNumberSnapshot(warehouseNumber);
 //        return new WarehouseActivity(
 //                warehouseNumber,
 //                warehouse.getSeller(),
-//                warehouse.getAmountReceived(),
+//                warehouse.getCurrentCapacity(),
 //                warehouse.getMaterialType()
 //        );
 //    }

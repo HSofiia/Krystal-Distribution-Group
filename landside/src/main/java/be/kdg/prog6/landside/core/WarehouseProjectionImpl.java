@@ -1,6 +1,6 @@
 package be.kdg.prog6.landside.core;
 
-import be.kdg.prog6.common.domain.ActivityAmountType;
+import be.kdg.prog6.common.domain.ActivityType;
 import be.kdg.prog6.landside.domain.WarehouseProjector;
 import be.kdg.prog6.landside.port.in.WarehouseProjection;
 import be.kdg.prog6.landside.port.out.warehouse.LoadWarehousePort;
@@ -21,7 +21,7 @@ public class WarehouseProjectionImpl implements WarehouseProjection {
 
     @Override
     @Transactional
-    public void warehouseProjection(int warehouseNumber, ActivityAmountType type, double amount) {
+    public void warehouseProjection(int warehouseNumber, ActivityType type, double amount) {
         WarehouseProjector warehouseProjector = loadWarehousePort.loadWarehouseByNumber(warehouseNumber).orElseThrow();
         warehouseProjector.modifyCapacity(type, amount);
         updatedWarehousePort.updateWarehouse(warehouseProjector);

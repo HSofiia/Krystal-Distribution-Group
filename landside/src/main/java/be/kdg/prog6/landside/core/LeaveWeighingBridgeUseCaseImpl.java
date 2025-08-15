@@ -1,9 +1,11 @@
 package be.kdg.prog6.landside.core;
 
 import be.kdg.prog6.common.domain.TruckPlate;
+import be.kdg.prog6.common.event.ConveyorPayloadEvent;
 import be.kdg.prog6.landside.domain.*;
 import be.kdg.prog6.landside.port.in.LeaveWeighingBridgeUseCase;
 import be.kdg.prog6.landside.port.in.WeighingBridgeCommand;
+import be.kdg.prog6.landside.port.out.CreatePdtPort;
 import be.kdg.prog6.landside.port.out.appointment.LoadAppointmentPort;
 import be.kdg.prog6.landside.port.out.appointment.SaveAppointmentPort;
 import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
@@ -26,14 +28,16 @@ public class LeaveWeighingBridgeUseCaseImpl implements LeaveWeighingBridgeUseCas
     private final SaveAppointmentPort saveAppointmentPort;
     private final LoadTruckWeightPort loadTruckWeightPort;
     private final List<UpdatedAppointmentPort> updatedAppointment;
+    private final CreatePdtPort createPdtPort;
     private final Logger log = getLogger(LeaveWeighingBridgeUseCaseImpl.class);
 
-    public LeaveWeighingBridgeUseCaseImpl(LoadAppointmentPort loadAppointmentPort, SaveTruckWeightPort saveTruckWeightPort, SaveAppointmentPort saveAppointmentPort, LoadTruckWeightPort loadTruckWeightPort, List<UpdatedAppointmentPort> updatedAppointment) {
+    public LeaveWeighingBridgeUseCaseImpl(LoadAppointmentPort loadAppointmentPort, SaveTruckWeightPort saveTruckWeightPort, SaveAppointmentPort saveAppointmentPort, LoadTruckWeightPort loadTruckWeightPort, List<UpdatedAppointmentPort> updatedAppointment, CreatePdtPort createPdtPort) {
         this.loadAppointmentPort = loadAppointmentPort;
         this.saveTruckWeightPort = saveTruckWeightPort;
         this.saveAppointmentPort = saveAppointmentPort;
         this.loadTruckWeightPort = loadTruckWeightPort;
         this.updatedAppointment = updatedAppointment;
+        this.createPdtPort = createPdtPort;
     }
 
 
@@ -81,6 +85,14 @@ public class LeaveWeighingBridgeUseCaseImpl implements LeaveWeighingBridgeUseCas
         saveAppointmentPort.update(appointment);
 
         updatedAppointment.forEach(port -> port.activityCreated(appointment, activity));
+
+        createPdtPort.sendPdt(new ConveyorPayloadEvent(
+                appointment.getWarehouseNumber(),
+                leavingTruckWeight.time(),
+                netWeight,
+                appointment.getMaterialType().name()
+        ));
+
         log.info("Appointment status updated to ARRIVED_ON_TIME for license plate: {}", leavingTruckWeight.licencePlate());
 
         return new WBT(

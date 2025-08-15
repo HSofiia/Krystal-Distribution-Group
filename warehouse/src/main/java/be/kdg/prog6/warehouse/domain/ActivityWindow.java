@@ -1,16 +1,13 @@
 package be.kdg.prog6.warehouse.domain;
 
-import be.kdg.prog6.common.domain.ActivityAmountType;
+import be.kdg.prog6.common.domain.ActivityType;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ActivityWindow {
     private int warehouseNumber;
-    private List<PayloadActivity> activities;
+    private final List<PayloadActivity> activities;
 
     public ActivityWindow(int warehouseNumber, List<PayloadActivity> activities) {
         this.warehouseNumber = warehouseNumber;
@@ -29,21 +26,36 @@ public class ActivityWindow {
         return Collections.unmodifiableList(activities);
     }
 
-    WarehouseCurrentCapacity calculateCapacity(final WarehouseCurrentCapacity currentCapacity){
-        final LocalDateTime time = activities.stream()
-                .max(Comparator.comparing(PayloadActivity::time))
-                .orElseThrow()
-                .time();
-        final double amount = activities.stream().mapToDouble(PayloadActivity::getChangeToCapacity).sum();
-        return new WarehouseCurrentCapacity(currentCapacity.number() + amount, time);
+    public Optional<PayloadActivity> findPendingPayloadActivity() {
+        return activities.stream()
+                .filter(a -> a.activityType() == ActivityType.DELIVERY && a.amount() == 0.0)
+                .findFirst();
     }
 
-    PayloadActivity addActivity(final ActivityAmountType type, final double amount) {
+    public double addChangeToCapacitySnapshot(LocalDateTime time) {
+        LocalDateTime snapshot = (time != null) ? time : LocalDateTime.MIN;
+
+        return activities.stream()
+                .filter(a -> a.time() != null && !a.time().isBefore(snapshot)) // >= snapshot
+                .mapToDouble(PayloadActivity::getChangeToCapacity)
+                .sum();
+    }
+
+    public Optional<LocalDateTime> findLastActivitySnapshot(LocalDateTime time) {
+        LocalDateTime snapshot = (time != null) ? time : LocalDateTime.MIN;
+
+        return activities.stream()
+                .map(PayloadActivity::time)
+                .filter(t -> t != null && !t.isBefore(snapshot))
+                .max(LocalDateTime::compareTo);
+    }
+
+    PayloadActivity addActivity(final ActivityType type, final double amount, LocalDateTime time) {
         final ActivityId activityId = new ActivityId(warehouseNumber, UUID.randomUUID());
         final PayloadActivity activity = new PayloadActivity(
                 activityId,
                 amount,
-                LocalDateTime.now(),
+                time,
                 type
         );
         activities.add(activity);

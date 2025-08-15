@@ -1,10 +1,8 @@
 package be.kdg.prog6.landside.domain;
 
-import be.kdg.prog6.common.domain.ActivityAmountType;
+import be.kdg.prog6.common.domain.ActivityType;
 import be.kdg.prog6.common.domain.MaterialType;
 import be.kdg.prog6.common.domain.SellerId;
-import be.kdg.prog6.landside.core.TruckArrivalGateUseCaseImpl;
-import org.slf4j.Logger;
 
 import java.util.UUID;
 
@@ -30,7 +28,7 @@ public class WarehouseProjector{
         this.maxCapacity = maxCapacity;
     }
 
-    public void modifyCapacity(final ActivityAmountType type, final double amount) {
+    public void modifyCapacity(final ActivityType type, final double amount) {
         if (type == null) {
             throw new IllegalArgumentException("ActivityAmountType cannot be null");
         }

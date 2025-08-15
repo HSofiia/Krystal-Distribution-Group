@@ -1,17 +1,18 @@
 package be.kdg.prog6.warehouse.adapter.out.warehouse;
 
-import be.kdg.prog6.warehouse.adapter.out.warehouseActivity.WarehouseActivityIdJpaEntity;
-import be.kdg.prog6.warehouse.adapter.out.warehouseActivity.WarehouseActivityJpaEntity;
-import be.kdg.prog6.warehouse.adapter.out.warehouseActivity.WarehouseActivityJpaRepository;
+import be.kdg.prog6.warehouse.adapter.out.payload.PayloadActivityJpaEntity;
+import be.kdg.prog6.warehouse.adapter.out.payload.PayloadRecordJpaRepository;
 import be.kdg.prog6.warehouse.domain.*;
 import be.kdg.prog6.warehouse.port.out.LoadWarehousePort;
 import be.kdg.prog6.warehouse.port.out.UpdateWarehouseCapacityPort;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -19,40 +20,53 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
     private static final Logger LOGGER = LoggerFactory.getLogger(WarehouseDatabaseAdapter.class);
 
     private final WarehouseJpaRepository warehouseJpaRepository;
-    private final WarehouseActivityJpaRepository warehouseActivityJpaRepository;
+    private final PayloadRecordJpaRepository payloadRecordJpaRepository;
 
-    public WarehouseDatabaseAdapter(WarehouseJpaRepository warehouseJpaRepository, WarehouseActivityJpaRepository warehouseActivityJpaRepository) {
+    public WarehouseDatabaseAdapter(WarehouseJpaRepository warehouseJpaRepository, PayloadRecordJpaRepository payloadRecordJpaRepository) {
         this.warehouseJpaRepository = warehouseJpaRepository;
-        this.warehouseActivityJpaRepository = warehouseActivityJpaRepository;
+        this.payloadRecordJpaRepository = payloadRecordJpaRepository;
     }
 
     @Override
-    public Optional<Warehouse> loadWarehouseByNumber(int warehouseNumber) {
-        return warehouseJpaRepository.findByWarehouseNumber(warehouseNumber).map(this::toDomain);
-    }
+    public Warehouse loadWarehouseByNumberSnapshot(int warehouseNumber) {
+        WarehouseJpaEntity warehouseJpaEntity = warehouseJpaRepository.findByWarehouseNumber(warehouseNumber)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Warehouse %s not found".formatted(warehouseNumber)));
 
-    private Warehouse toDomain(final WarehouseJpaEntity warehouse) {
-        final int number = warehouse.getWarehouseNumber();
-        final ActivityWindow activities = toActivityWindow(warehouse, number);
-        final WarehouseCurrentCapacity currentCapacity = toCurrentCapacity(warehouse);
-        return new Warehouse(number, currentCapacity, activities);
-    }
+        WarehouseCurrentCapacity currentCapacity = toCurrentCapacity(warehouseJpaEntity);
 
-    private ActivityWindow toActivityWindow(final WarehouseJpaEntity warehouseJpaEntity, int warehouseNumber) {
-        final List<PayloadActivity> activities = warehouseActivityJpaRepository
-                .findAllById_WarehouseNumberAndTimeAfter(warehouseNumber, warehouseJpaEntity.getCapacityReceivedTime())
-                .stream()
-                .map(WarehouseDatabaseAdapter::toActivity)
+        LocalDateTime snapshot = warehouseJpaEntity.getCapacityReceivedTime();
+        if (snapshot == null || snapshot.getYear() < 1970 || snapshot.getYear() > 9999) {
+            snapshot = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
+        }
+
+        List<PayloadActivityJpaEntity> activityRows =
+                payloadRecordJpaRepository.findAllByTimeGreaterThanEqualAndWarehouseWarehouseNumber(
+                        snapshot,
+                        warehouseJpaEntity.getWarehouseNumber()
+                );
+
+        List<PayloadActivity> activities = activityRows.stream()
+                .map(WarehouseDatabaseAdapter::toDomainActivity)
                 .collect(Collectors.toList());
-        return new ActivityWindow(warehouseNumber, activities);
+
+        ActivityWindow activityWindow = new ActivityWindow(warehouseJpaEntity.getWarehouseNumber(), activities);
+
+        return new Warehouse(
+                warehouseJpaEntity.getWarehouseNumber(),
+                warehouseJpaEntity.getMaterialType(),
+                currentCapacity,
+                activityWindow
+        );
     }
 
-    private static PayloadActivity toActivity(final WarehouseActivityJpaEntity activity) {
+    private static PayloadActivity toDomainActivity(PayloadActivityJpaEntity row) {
+        ActivityId id = new ActivityId(row.getWarehouse().getWarehouseNumber(), row.getId());
         return new PayloadActivity(
-                new ActivityId(activity.getId().getWarehouseNumber(), activity.getId().getActivityId()),
-                activity.getAmount()
-,                activity.getTime(),
-                activity.getType()
+                id,
+                row.getNetWeight(),
+                row.getTime(),
+                row.getActivityType()
         );
     }
 
@@ -61,27 +75,23 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
     }
 
     @Override
-    public void activityAdded(final Warehouse warehouse, final PayloadActivity activity) {
-        final int number = warehouse.getWarehouseNumber();
+    @Transactional
+    public void updateWarehouse(Warehouse warehouse) {
+        int number = warehouse.getWarehouseNumber();
 
-        final WarehouseJpaEntity warehouseJpaEntity = warehouseJpaRepository.findByWarehouseNumber(number).orElseThrow();
-        final WarehouseCurrentCapacity currentCapacity = warehouse.calculateCapacity();
+        // Reload fresh state (includes the updated net_weight)
+        Warehouse fresh = loadWarehouseByNumberSnapshot(number);
+
+        WarehouseCurrentCapacity currentCapacity = fresh.calculateCapacity();
+
+        WarehouseJpaEntity warehouseJpaEntity = warehouseJpaRepository
+                .findByWarehouseNumber(number)
+                .orElseThrow(() -> new EntityNotFoundException("Warehouse %s not found".formatted(number)));
+
         warehouseJpaEntity.setCapacity(currentCapacity.number());
         warehouseJpaEntity.setCapacityReceivedTime(currentCapacity.time());
-        warehouseJpaEntity.getActivities().add(toWarehouseActivity(warehouseJpaEntity, activity));
-        LOGGER.info("Updating warehouse {} with capacity of {}", number, currentCapacity);
+
+        LOGGER.info("Updating warehouse {} with capacity {} at {}", number, currentCapacity.number(), currentCapacity.time());
         warehouseJpaRepository.save(warehouseJpaEntity);
-    }
-
-
-    private WarehouseActivityJpaEntity toWarehouseActivity(final WarehouseJpaEntity warehouseJpaEntity,
-                                                           final PayloadActivity activity) {
-        final WarehouseActivityJpaEntity warehouseActivityJpaEntity = new WarehouseActivityJpaEntity();
-        warehouseActivityJpaEntity.setId(WarehouseActivityIdJpaEntity.of(activity.activityId()));
-        warehouseActivityJpaEntity.setType(activity.activityType());
-        warehouseActivityJpaEntity.setAmount(activity.amount());
-        warehouseActivityJpaEntity.setTime(activity.time());
-        warehouseActivityJpaEntity.setWarehouse(warehouseJpaEntity);
-        return warehouseActivityJpaEntity;
     }
 }

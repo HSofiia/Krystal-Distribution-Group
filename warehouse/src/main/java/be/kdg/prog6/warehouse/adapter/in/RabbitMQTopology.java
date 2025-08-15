@@ -19,10 +19,10 @@ public class RabbitMQTopology {
     public static final String LANDSIDE_EXCHANGE = "landside_events";
     public static final String WAREHOUSE_CAPACITY_QUEUED = "warehouse_capacity_queue";
 
+    public static final String INVOICING_EXCHANGE = "invoicing_exchange";
+    public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received_queue";
 
-    public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received";
-
-    @Bean
+        @Bean
     TopicExchange warehouseCapacityExchange() {
         return new TopicExchange(LANDSIDE_EXCHANGE);
     }
@@ -33,24 +33,29 @@ public class RabbitMQTopology {
     }
 
     @Bean
-    Queue weightReceivedQueue() {
-        return new Queue(PAYLOAD_RECEIVED_QUEUE, true);
-    }
-
-    @Bean
-    Binding bindingPayloadReceived(TopicExchange exchange, Queue weightReceivedQueue) {
-        return BindingBuilder
-                .bind(weightReceivedQueue)
-                .to(exchange)
-                .with("warehouse.#.payload.received");
-    }
-
-    @Bean
     Binding bindingCapacityChanged(TopicExchange warehouseCapacityExchange, Queue warehouseCapacityQueue) {
         return BindingBuilder
                 .bind(warehouseCapacityQueue)
                 .to(warehouseCapacityExchange)
-                .with("warehouse.#.capacity.changed");
+                .with("warehouse.#.capacity.updated");
+    }
+
+    @Bean
+    TopicExchange invoiceExchange() {
+        return new TopicExchange(INVOICING_EXCHANGE);
+    }
+
+    @Bean
+    Queue payloadReceivedQueue() {
+        return new Queue(PAYLOAD_RECEIVED_QUEUE);
+    }
+
+    @Bean
+    Binding bindingPayloadReceived(TopicExchange invoiceExchange, Queue payloadReceivedQueue) {
+        return BindingBuilder
+                .bind(payloadReceivedQueue)
+                .to(invoiceExchange)
+                .with("payload.#.received");
     }
 
     @Bean

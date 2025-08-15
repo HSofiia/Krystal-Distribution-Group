@@ -1,46 +1,58 @@
 package be.kdg.prog6.warehouse.adapter.out.payload;
 
-import be.kdg.prog6.warehouse.port.in.PayloadCommand;
-import be.kdg.prog6.warehouse.port.out.SaveWarehousePayloadRecordPort;
+import be.kdg.prog6.warehouse.adapter.out.warehouse.WarehouseJpaEntity;
+import be.kdg.prog6.warehouse.adapter.out.warehouse.WarehouseJpaRepository;
+import be.kdg.prog6.warehouse.domain.PayloadActivity;
+import be.kdg.prog6.warehouse.port.out.SavePayloadActivityPort;
+import be.kdg.prog6.warehouse.port.out.UpdatePayloadActivityPort;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public class PayloadRecordDatabaseAdapter implements SaveWarehousePayloadRecordPort {
+public class PayloadRecordDatabaseAdapter implements SavePayloadActivityPort, UpdatePayloadActivityPort {
 
     private final PayloadRecordJpaRepository payloadRecordRepository;
+    private final WarehouseJpaRepository warehouseJpaRepository;
 
-    public PayloadRecordDatabaseAdapter(PayloadRecordJpaRepository payloadRecordRepository) {
+    public PayloadRecordDatabaseAdapter(PayloadRecordJpaRepository payloadRecordRepository, WarehouseJpaRepository warehouseJpaRepository) {
         this.payloadRecordRepository = payloadRecordRepository;
+        this.warehouseJpaRepository = warehouseJpaRepository;
     }
 
 
     @Override
-    public void saveOrUpdatePDT(PayloadCommand command) {
-        Optional<PayloadActivityJpaEntity> existingPDT = payloadRecordRepository.findFirstByWarehouseNumberAndNetWeight(
-                command.warehouseNumber(),
-                0.0
-        );
+    public void savePayload(PayloadActivity payloadActivity, int warehouseNumber) {
+        PayloadActivityJpaEntity existingPayloadJpa = toEntity(payloadActivity);
+        WarehouseJpaEntity warehouseJpaEntity = warehouseJpaRepository.getReferenceById(warehouseNumber);
 
-        if(existingPDT.isEmpty()) {
-            payloadRecordRepository.save(toEntity(command));
-        } else {
-            PayloadActivityJpaEntity entity = existingPDT.get();
-            entity.setNetWeight(command.netWeight());
-            payloadRecordRepository.save(entity);
-        }
+        existingPayloadJpa.setWarehouse(warehouseJpaEntity);
+
+        payloadRecordRepository.save(existingPayloadJpa);
     }
 
+    @Override
+    public void updatePayload(PayloadActivity payloadActivity, int warehouseNumber, double netWeight){
+        PayloadActivityJpaEntity payloadActivityJpaEntity = payloadRecordRepository
+                .findFirstByWarehouseAndTime(
+                        warehouseNumber,
+                        payloadActivity.amount(),
+                        payloadActivity.time())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("PayloadActivity not found"));
 
-    private PayloadActivityJpaEntity toEntity(PayloadCommand command){
+        payloadActivityJpaEntity.setNetWeight(netWeight);
+        payloadRecordRepository.save(payloadActivityJpaEntity);
+    }
+
+    private PayloadActivityJpaEntity toEntity(PayloadActivity payloadActivity){
         return new PayloadActivityJpaEntity(
                 UUID.randomUUID(),
-                command.warehouseNumber(),
-                command.netWeight(),
-                command.time(),
-                command.activityType()
+                payloadActivity.amount(),
+                payloadActivity.time(),
+                payloadActivity.activityType()
         );
     }
 }

@@ -1,9 +1,8 @@
 package be.kdg.prog6.warehouse.adapter.out.warehouse;
 
 import be.kdg.prog6.common.domain.MaterialType;
-import be.kdg.prog6.warehouse.adapter.out.warehouseActivity.WarehouseActivityJpaEntity;
+import be.kdg.prog6.warehouse.adapter.out.payload.PayloadActivityJpaEntity;
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,26 +11,26 @@ import java.util.List;
 @Table(name = "warehouses", catalog = "whside")
 public class WarehouseJpaEntity {
     @Id
-    @Column(name = "warehouseNumber")
+    @Column(name = "warehouse_number")
     private int warehouseNumber;
 
     @Column(name = "capacity")
     private double capacity;
 
-    @Column(name = "maxCapacity")
+    @Column(name = "max_capacity")
     private double maxCapacity;
 
-    @Column(name = "materialType")
-    @Enumerated(value = EnumType.STRING)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "material_type")
     private MaterialType materialType;
 
-    @Transient
+    @Column(name = "capacity_received_time")
     private LocalDateTime capacityReceivedTime;
 
-    @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
-    private List<WarehouseActivityJpaEntity> activities;
+    @OneToMany(mappedBy = "warehouse")
+    private List<PayloadActivityJpaEntity> activities;
 
-    public WarehouseJpaEntity(int warehouseNumber, double capacity, double maxCapacity, MaterialType materialType, LocalDateTime capacityReceivedTime, List<WarehouseActivityJpaEntity> activities) {
+    public WarehouseJpaEntity(int warehouseNumber, double capacity, double maxCapacity, MaterialType materialType, LocalDateTime capacityReceivedTime, List<PayloadActivityJpaEntity> activities) {
         this.warehouseNumber = warehouseNumber;
         this.capacity = capacity;
         this.maxCapacity = maxCapacity;
@@ -75,11 +74,11 @@ public class WarehouseJpaEntity {
         this.capacityReceivedTime = capacityReceivedTime;
     }
 
-    public List<WarehouseActivityJpaEntity> getActivities() {
+    public List<PayloadActivityJpaEntity> getActivities() {
         return activities;
     }
 
-    public void setActivities(List<WarehouseActivityJpaEntity> activities) {
+    public void setActivities(List<PayloadActivityJpaEntity> activities) {
         this.activities = activities;
     }
 

@@ -10,7 +10,6 @@ import be.kdg.prog6.landside.port.out.appointment.UpdatedAppointmentPort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 @Service
@@ -35,11 +34,10 @@ public class DumpPayloadUseCaseImpl implements DumpPayloadUseCase {
         Activity activity = appointment.addActivity(ActivityType.DUMP_LOAD, TruckStatus.ON_SITE, command.time());
         updatedAppointment.activityCreated(appointment, activity);
         createPdtPort.sendPdt(new ConveyorPayloadEvent(
-                appointment.getMaterialType().name(),
                 appointment.getWarehouseNumber(),
-                appointment.getTruck().licensePlate(),
-                LocalDateTime.now(),
-                0.0
+                command.time(),
+                0.0,
+                appointment.getMaterialType().name()
                 ));
                 logger.info(String.format("Truck %s dumped material on conveyor belt.", command.licencePlate()));
 

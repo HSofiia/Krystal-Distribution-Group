@@ -17,20 +17,9 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQTopology {
 
     public static final String WAREHOUSE_EVENTS_EXCHANGE = "warehouse_events";
-    public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received";
 
     public static final String PAYLOAD_TICKET_EXCHANGE = "payload_delivery_ticket_exchange";
     public static final String PAYLOAD_TICKET_QUEUE = "payload_delivery_ticket_queue";
-
-//    @Bean
-//    TopicExchange warehouseEventsExchange() {
-//        return new TopicExchange(WAREHOUSE_EVENTS_EXCHANGE);
-//    }
-//
-//    @Bean
-//    Queue weightReceivedQueue() {
-//        return new Queue(PAYLOAD_RECEIVED_QUEUE, true);
-//    }
 
     @Bean
     TopicExchange pdtExchange() {
@@ -48,7 +37,6 @@ public class RabbitMQTopology {
                 .bind(queue)
                 .to(exchange)
                 .with("landside.#.pdt.received");
-//                .with("warehouse.#.payload.received");
     }
 
     @Bean

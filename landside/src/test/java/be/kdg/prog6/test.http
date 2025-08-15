@@ -14,8 +14,8 @@ scope = openid
     console.log("Access Token:", client.global.get("access_token"));
 %}
 
-###
 
+### Make appointment
 
 POST http://localhost:8091/bca/appointment/3a9db4e9-e92b-4f9e-95fe-8e39fc1e8798
 Authorization: Bearer {{access_token}}
@@ -27,7 +27,7 @@ Content-Type: application/json
   "materialType": "CEMENT"
 }
 
-###
+### Truck arrives at site
 
 POST http://localhost:8091/bca/open-gate/arrived
 Authorization: Bearer {{access_token}}
@@ -38,7 +38,7 @@ Content-Type: application/json
   "arrivalTime": "2024-11-05T11:25:00"
 }
 
-###
+### Weighing bridge - ENTER
 
 POST http://localhost:8091/bca/weighing-bridge/enter
 Authorization: Bearer {{access_token}}
@@ -50,7 +50,7 @@ Content-Type: application/json
     "time": "2024-11-05T11:26:59"
 }
 
-### POST Test truck docking to conveyor belt to drop payload
+### Dump payload at conveyor belt (landside)
 
 POST http://localhost:8091/bca/conveyorBelt/KDJ378
 Content-Type: application/json
@@ -58,7 +58,7 @@ Authorization: Bearer {{access_token}}
 
 {}
 
-###
+### Leave the side and publish weight
 
 POST http://localhost:8091/bca/weighing-bridge/left
 Authorization: Bearer {{access_token}}

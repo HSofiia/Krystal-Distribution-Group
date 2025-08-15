@@ -1,51 +1,59 @@
 package be.kdg.prog6.warehouse.adapter.out.payload;
 
-import be.kdg.prog6.common.domain.ActivityAmountType;
+import be.kdg.prog6.common.domain.ActivityType;
+import be.kdg.prog6.warehouse.adapter.out.warehouse.WarehouseJpaEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "pdtActivity", catalog = "whside")
+@Table(name = "pdt_activity", catalog = "whside")
 public class PayloadActivityJpaEntity {
 
     @Id
-    @Column
+    @Column(name = "id")
     private UUID id;
 
-    @Column
-    private int warehouseNumber;
-
-    @Column
+    @Column(name = "net_weight")
     private double netWeight;
 
-    @Column
+    @Column(name = "time")
     private LocalDateTime time;
 
-    @Column
     @Enumerated(value = EnumType.STRING)
-    private ActivityAmountType activityType;
+    @Column(name = "activity_type")
+    private ActivityType activityType;
 
-    public PayloadActivityJpaEntity(UUID id, int warehouseNumber, double netWeight, LocalDateTime time, ActivityAmountType activityType) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouse_warehouse_number", nullable = false)
+    private WarehouseJpaEntity warehouse;
+
+    public PayloadActivityJpaEntity(UUID id, double netWeight, LocalDateTime time, ActivityType activityType) {
         this.id = id;
-        this.warehouseNumber = warehouseNumber;
         this.netWeight = netWeight;
         this.time = time;
         this.activityType = activityType;
     }
 
-
     public PayloadActivityJpaEntity() {
 
     }
 
-    public int getWarehouseNumber() {
-        return warehouseNumber;
+    public UUID getId() {
+        return id;
     }
 
-    public void setWarehouseNumber(int warehouseNumber) {
-        this.warehouseNumber = warehouseNumber;
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public WarehouseJpaEntity getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(WarehouseJpaEntity warehouse) {
+        this.warehouse = warehouse;
     }
 
     public double getNetWeight() {
@@ -64,11 +72,11 @@ public class PayloadActivityJpaEntity {
         this.time = time;
     }
 
-    public ActivityAmountType getActivityType() {
+    public ActivityType getActivityType() {
         return activityType;
     }
 
-    public void setActivityType(ActivityAmountType activityType) {
+    public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
     }
 }
