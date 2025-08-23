@@ -4,7 +4,7 @@ import be.kdg.prog6.common.domain.MaterialType;
 import be.kdg.prog6.common.domain.Measure;
 
 public record OrderLine(MaterialType materialType, double quantity, Measure measure) {
-    public Double getAmount() {
+    public double getAmount() {
         return quantity * measure.toTonsFactor();
     }
 }

@@ -6,5 +6,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record CommissionEvent(String poNumber, UUID sellerId, List<OrderLine> orderLines, LocalDateTime when) {
+public record CommissionEvent(String poNumber, UUID sellerId, List<OrderLine> orderLines) {
 }

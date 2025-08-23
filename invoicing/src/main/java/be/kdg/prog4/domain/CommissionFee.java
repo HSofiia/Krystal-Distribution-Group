@@ -10,16 +10,14 @@ public class CommissionFee {
     private SellerId sellerId;
     private PONumber poNumber;
     private double poAmount;         // baseAmount * (ratePercent/100)
-    private LocalDateTime chargedAt;
     private boolean invoiced;
     private UUID invoiceId;
 
-    public CommissionFee(UUID id, SellerId sellerId, PONumber poNumber, double poAmount, LocalDateTime chargedAt) {
+    public CommissionFee(UUID id, SellerId sellerId, PONumber poNumber, double poAmount) {
         this.id = id;
         this.sellerId = sellerId;
         this.poNumber = poNumber;
         this.poAmount = poAmount;
-        this.chargedAt = chargedAt;
     }
 
     public void markInvoiced(UUID invoiceId) {
@@ -61,14 +59,6 @@ public class CommissionFee {
 
     public void setAmount(double poAmount) {
         this.poAmount = poAmount;
-    }
-
-    public LocalDateTime getChargedAt() {
-        return chargedAt;
-    }
-
-    public void setChargedAt(LocalDateTime chargedAt) {
-        this.chargedAt = chargedAt;
     }
 
     public boolean isInvoiced() {

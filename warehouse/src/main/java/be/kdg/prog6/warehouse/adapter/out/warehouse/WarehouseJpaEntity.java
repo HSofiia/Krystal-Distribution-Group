@@ -17,7 +17,7 @@ public class WarehouseJpaEntity {
     @Column(name = "warehouse_number")
     private int warehouseNumber;
 
-    @Column(name = "capacity")
+    @Column(name = "current_capacity")
     private double capacity;
 
     @Column(name = "max_capacity")

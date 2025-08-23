@@ -19,10 +19,27 @@ public class RabbitMQTopology {
     public static final String LANDSIDE_EXCHANGE = "landside_events";
     public static final String WAREHOUSE_CAPACITY_QUEUED = "warehouse_capacity_queue";
 
-    public static final String INVOICING_EXCHANGE = "invoicing_exchange";
-    public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received_queue";
-
     public static final String COMMISSIONS_QUEUE = "commissions_queue";
+
+    public static final String PAYLOAD_TICKET_EXCHANGE = "payload_delivery_ticket_exchange";
+    public static final String PAYLOAD_DELIVERY_TICKET_QUEUE = "payload_delivery_ticket_queue";
+
+    @Bean
+    TopicExchange pdtExchange() {
+        return new TopicExchange(PAYLOAD_TICKET_EXCHANGE, true, false);
+    }
+
+    @Bean
+    Queue payloadDeliveryTicketQueue() {
+        return new Queue(PAYLOAD_DELIVERY_TICKET_QUEUE, true);
+    }
+
+    @Bean
+    Binding bindingPdt(TopicExchange pdtExchange, Queue payloadDeliveryTicketQueue) {
+        return BindingBuilder.bind(payloadDeliveryTicketQueue)
+                .to(pdtExchange)
+                .with("landside.#.pdt.received");
+    }
 
     @Bean
     TopicExchange warehouseCapacityExchange() {
@@ -42,23 +59,26 @@ public class RabbitMQTopology {
                 .with("warehouse.#.capacity.updated");
     }
 
-    @Bean
-    TopicExchange invoiceExchange() {
-        return new TopicExchange(INVOICING_EXCHANGE);
-    }
-
-    @Bean
-    Queue payloadReceivedQueue() {
-        return new Queue(PAYLOAD_RECEIVED_QUEUE);
-    }
-
-    @Bean
-    Binding bindingPayloadReceived(TopicExchange invoiceExchange, Queue payloadReceivedQueue) {
-        return BindingBuilder
-                .bind(payloadReceivedQueue)
-                .to(invoiceExchange)
-                .with("payload.#.delivered");
-    }
+    public static final String INVOICING_EXCHANGE = "invoicing_exchange";
+//    public static final String PAYLOAD_RECEIVED_QUEUE = "payload_received_queue";
+//
+//    @Bean
+//    TopicExchange invoiceExchange() {
+//        return new TopicExchange(INVOICING_EXCHANGE);
+//    }
+//
+//    @Bean
+//    Queue payloadReceivedQueue() {
+//        return new Queue(PAYLOAD_RECEIVED_QUEUE);
+//    }
+//
+//    @Bean
+//    Binding bindingPayloadReceived(TopicExchange invoiceExchange, Queue payloadReceivedQueue) {
+//        return BindingBuilder
+//                .bind(payloadReceivedQueue)
+//                .to(invoiceExchange)
+//                .with("payload.#.delivered");
+//    }
 
     @Bean
     TopicExchange invoicingExchange() {
@@ -74,7 +94,37 @@ public class RabbitMQTopology {
     Binding commissionsBinding(TopicExchange invoicingExchange, Queue commissionsQueue) {
         return BindingBuilder.bind(commissionsQueue)
                 .to(invoicingExchange)
-                .with("po.%s.commission.request");
+                .with("po.#.commission.request");
+    }
+
+    public static final String CHANGE_ORDER_STATUS_EXCHANGE = "change_order_status_exchange";
+    public static final String FULFILL_ORDER_STATUS_QUEUE = "fulfill_order_status_queue";
+    public static final String MATCH_ORDER_STATUS_QUEUE = "match_order_status_queue";
+
+    @Bean TopicExchange changeOrderStatusExchange() {
+        return new TopicExchange(CHANGE_ORDER_STATUS_EXCHANGE, true, false);
+    }
+
+    @Bean Queue fulfillOrderStatusQueue() {
+        return new Queue(FULFILL_ORDER_STATUS_QUEUE, true);
+    }
+
+    @Bean Queue matchOrderStatusQueue() {
+        return new Queue(MATCH_ORDER_STATUS_QUEUE, true);
+    }
+
+    @Bean Binding bindingFulfillOrderStatus(TopicExchange changeOrderStatusExchange,
+                                            Queue fulfillOrderStatusQueue) {
+        return BindingBuilder.bind(fulfillOrderStatusQueue)
+                .to(changeOrderStatusExchange)
+                .with("status.#.issued");
+    }
+
+    @Bean Binding bindingMatchOrderStatus(TopicExchange changeOrderStatusExchange,
+                                          Queue matchOrderStatusQueue) {
+        return BindingBuilder.bind(matchOrderStatusQueue)
+                .to(changeOrderStatusExchange)
+                .with("status.#.matched");
     }
 
     @Bean

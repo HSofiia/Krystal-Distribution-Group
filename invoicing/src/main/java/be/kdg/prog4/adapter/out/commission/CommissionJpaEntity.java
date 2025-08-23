@@ -23,18 +23,14 @@ public class CommissionJpaEntity {
     @Column(name = "amount", nullable = false)
     private double amount;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
     public CommissionJpaEntity() {
     }
 
-    public CommissionJpaEntity(UUID id, UUID sellerId, String poNumber, double amount, LocalDateTime createdAt) {
+    public CommissionJpaEntity(UUID id, UUID sellerId, String poNumber, double amount) {
         this.id = id;
         this.sellerId = sellerId;
         this.poNumber = poNumber;
         this.amount = amount;
-        this.createdAt = createdAt;
     }
 
     public UUID getId() {
@@ -67,13 +63,5 @@ public class CommissionJpaEntity {
 
     public void setAmount(double amount) {
         this.amount = amount;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

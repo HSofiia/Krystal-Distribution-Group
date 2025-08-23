@@ -18,11 +18,9 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, LoadWarehous
     private final WarehouseJpaRepository warehouseJpaRepository;
     private final Logger log = getLogger(WarehouseDatabaseAdapter.class);
 
-
     public WarehouseDatabaseAdapter(WarehouseJpaRepository warehouseJpaRepository) {
         this.warehouseJpaRepository = warehouseJpaRepository;
     }
-
 
     @Override
     public Optional<WarehouseProjector> loadWarehouseByNumber(int warehouseId) {

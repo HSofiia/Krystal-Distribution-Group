@@ -7,6 +7,8 @@ dependencies {
     implementation project(":common")
     implementation project(':landside')
     implementation project(':warehouse')
+    implementation project(':waterside')
+    implementation project(':invoicing')
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-security'

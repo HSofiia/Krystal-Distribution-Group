@@ -54,7 +54,7 @@ public class Warehouse {
     public double calculateStorageFee(LocalDate asOfDate) {
         return payloads.stream()
                 .mapToDouble(p -> {
-                    long days = ChronoUnit.DAYS.between(p.getDeliveredAt(), asOfDate);
+                    long days = ChronoUnit.DAYS.between(p.getDeliveredAt(), asOfDate.atStartOfDay());
                     if (days < 0) days = 0;
 
                     return materialType.calculatePricePerTonPerDay(p.getNetTons(), days);

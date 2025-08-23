@@ -1,0 +1,56 @@
+POST http://localhost:8180/realms/kdg/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = landside_client &
+client_secret = ToYvMNQKxFA1AXSdWZ4xIWRNVgkJ9HNV &
+username = developer &
+password = password &
+grant_type = password &
+scope = openid
+
+//saving the access token
+> {%
+    client.global.set("access_token", response.body.access_token);
+    console.log("Access Token:", client.global.get("access_token"));
+%}
+
+
+### POST input vessel and shipment order info
+POST http://localhost:8094/bcd/arrivals/V12345
+Content-Type: application/json
+
+{
+  "purchaseOrderNumber": "PO123456",
+  "customerEnterpriseNumber": "ENT789012",
+  "departureDate": "2024-11-06"
+}
+
+### POST input vessel and shipment order info
+POST http://localhost:8094/bcd/arrivals/V1654
+Content-Type: application/json
+
+{
+  "purchaseOrderNumber": "PO7891",
+  "customerEnterpriseNumber": "ENT789012",
+  "departureDate": "2024-11-16"
+}
+
+
+### POST match SO and PO
+POST http://localhost:8094/bcd/vessels/V1654/matchOrders
+
+### POST plan bunkering operation
+POST http://localhost:8094/bcd/vessels/V1654/bunkeringOperations/2024-11-04
+
+
+### POST complete vesel inspection
+POST http://localhost:8094/bcd/vessels/V1654/inspectionOperations/Mykhailo-Kruts
+
+#### POST check if vessel can leave
+#POST http://localhost:8094/wsc/vessels/V12345
+
+#### Get all ships with outstanding IO's
+#GET http://localhost:8094/wsc/vessels/outstanding-inspection-operations
+#
+#### Get all shipments arrivals
+#GET http://localhost:8094/wsc/arrivals

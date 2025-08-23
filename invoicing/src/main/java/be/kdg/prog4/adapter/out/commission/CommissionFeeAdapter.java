@@ -34,8 +34,7 @@ public class CommissionFeeAdapter implements SaveCommissionFeePort, LoadCommissi
                 fee.getId(),
                 fee.getSellerId().sellerId(),
                 fee.getPoNumber().value(),
-                fee.getAmount(),
-                fee.getChargedAt()
+                fee.getAmount()
         );
     }
 
@@ -44,8 +43,7 @@ public class CommissionFeeAdapter implements SaveCommissionFeePort, LoadCommissi
                 e.getId(),
                 new SellerId(e.getSellerId()),
                 new PONumber(e.getPoNumber()),
-                e.getAmount(),
-                e.getCreatedAt()
+                e.getAmount()
         );
     }
 }

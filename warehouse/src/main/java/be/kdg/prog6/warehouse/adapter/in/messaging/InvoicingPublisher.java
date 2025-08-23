@@ -19,7 +19,7 @@ public class InvoicingPublisher implements InvoicingPOPort, UpdateInvoicingPort 
 
     @Override
     public void publishCommissionRequest(CalculatePOCommissionEvent event){
-        String routingKey = "po.%s.commission.request".formatted(event.poNumber());
+        String routingKey = "po.%s.commission.request".formatted(UUID.randomUUID());
         rabbitTemplate.convertAndSend(
                 RabbitMQTopology.INVOICING_EXCHANGE,
                 routingKey,

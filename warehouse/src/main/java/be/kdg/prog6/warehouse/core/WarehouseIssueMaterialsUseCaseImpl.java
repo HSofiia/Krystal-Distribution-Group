@@ -86,6 +86,8 @@ public class WarehouseIssueMaterialsUseCaseImpl implements WarehouseIssueMateria
                 po.getSeller().getSellerId().sellerId(),
                 po.poNumber().number()
         );
+
+        log.info("Publishing commission request for PO {}", po.poNumber().number());
         invoicingPOPort.publishCommissionRequest(commissionEvent);
 
         log.info("PO {} fulfilled and invoicing notified", poNumber.number());

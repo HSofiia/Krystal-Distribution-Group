@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
 
     @Override
     public Warehouse loadWarehouseByNumberSnapshot(int warehouseNumber) {
-        WarehouseJpaEntity entity = warehouseJpaRepository.findByWarehouseNumber(warehouseNumber)
+        WarehouseJpaEntity entity = warehouseJpaRepository.findByWarehouseNumberWithSeller(warehouseNumber)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Warehouse %s not found".formatted(warehouseNumber)));
         return fromJpa(entity);
@@ -43,14 +42,14 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
     @Override
     public Warehouse loadWarehouseByOwnerIdAndMaterialType(SellerId id, MaterialType materialType){
         return warehouseJpaRepository
-                .findBySellerIdAndMaterialType(id.sellerId(), materialType)
+                .findBySellerIdAndMaterialTypeWithSeller(id.sellerId(), materialType)
                 .map(this::fromJpa)
                 .orElseThrow(() -> new EntityNotFoundException("Warehouse not found"));
     }
 
     @Override
     public List<Warehouse> loadAllWarehousesSnapshot() {
-        return warehouseJpaRepository.findAll()
+        return warehouseJpaRepository.findAllWithSeller()
                 .stream()
                 .map(w -> {
                     List<PayloadActivityJpaEntity> payloadActivities = payloadRecordJpaRepository
@@ -72,13 +71,13 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
         WarehouseCurrentCapacity currentCapacity = fresh.calculateCapacity();
 
         WarehouseJpaEntity warehouseJpaEntity = warehouseJpaRepository
-                .findByWarehouseNumber(number)
+                .findByWarehouseNumberWithSeller(number)
                 .orElseThrow(() -> new EntityNotFoundException("Warehouse %s not found".formatted(number)));
 
-        warehouseJpaEntity.setCapacity(currentCapacity.number());
+        warehouseJpaEntity.setCapacity(currentCapacity.capacity());
         warehouseJpaEntity.setCapacityReceivedTime(currentCapacity.time());
 
-        LOGGER.info("Updating warehouse {} with capacity {} at {}", number, currentCapacity.number(), currentCapacity.time());
+        LOGGER.info("Updating warehouse {} with capacity {} at {}", number, currentCapacity.capacity(), currentCapacity.time());
         warehouseJpaRepository.save(warehouseJpaEntity);
     }
 
@@ -116,6 +115,7 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
                 warehouseJpaEntity.getWarehouseNumber(),
                 warehouseJpaEntity.getMaterialType(),
                 currentCapacity,
+                warehouseJpaEntity.getMaxCapacity(),
                 activityWindow,
                 seller
         );

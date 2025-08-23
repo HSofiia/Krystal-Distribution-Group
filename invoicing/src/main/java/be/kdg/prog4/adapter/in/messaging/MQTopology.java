@@ -35,7 +35,14 @@ public class MQTopology {
 
     @Bean
     Binding bindCommission(TopicExchange invoicingExchange, Queue commissionsQueue) {
-        return BindingBuilder.bind(commissionsQueue).to(invoicingExchange).with("po.%s.commission.request");
+        return BindingBuilder.bind(commissionsQueue).to(invoicingExchange).with("po.#.commission.request");
+    }
+
+    @Bean
+    Binding bindPayloadDelivered(TopicExchange invoicingExchange, Queue payloadDeliveryQueue) {
+        return BindingBuilder.bind(payloadDeliveryQueue)
+                .to(invoicingExchange)
+                .with("payload.#.delivered");
     }
 
     @Bean

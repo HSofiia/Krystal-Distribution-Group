@@ -10,14 +10,15 @@ public class Warehouse {
     private int warehouseNumber;
     private MaterialType materialType;
     private final WarehouseCurrentCapacity currentCapacity;
+    private double maxCapacity;
     private final ActivityWindow activities;
     private final Seller seller;
 
-    public Warehouse(int warehouseNumber, MaterialType materialType, WarehouseCurrentCapacity currentCapacity, ActivityWindow activities, Seller seller
-    ) {
+    public Warehouse(int warehouseNumber, MaterialType materialType, WarehouseCurrentCapacity currentCapacity, double maxCapacity, ActivityWindow activities, Seller seller) {
         this.warehouseNumber = warehouseNumber;
         this.materialType = materialType;
         this.currentCapacity = currentCapacity;
+        this.maxCapacity = maxCapacity;
         this.activities = activities;
         this.seller = seller;
     }
@@ -58,7 +59,7 @@ public class Warehouse {
         double addedWeight = activities.addChangeToCapacitySnapshot(snapshot);
         Optional<LocalDateTime> lastOptional = activities.findLastActivitySnapshot(snapshot);
         LocalDateTime last = lastOptional.orElse(snapshot);
-        return new WarehouseCurrentCapacity(currentCapacity.number() + addedWeight, last);
+        return new WarehouseCurrentCapacity(currentCapacity.capacity() + addedWeight, last);
     }
 
 
@@ -72,5 +73,13 @@ public class Warehouse {
 
     public PayloadActivity createDeliveryActivity(double amount, LocalDateTime time) {
         return activities.addActivity(ActivityType.DELIVERY, amount, time);
+    }
+
+    public double getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public void setMaxCapacity(double maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 }

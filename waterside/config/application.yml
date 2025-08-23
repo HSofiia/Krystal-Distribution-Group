@@ -1,0 +1,37 @@
+server:
+  port: ${PORT:8094}
+  servlet:
+    context-path: /bcd
+
+spring:
+  jpa:
+    defer-datasource-initialization: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+      show-sql: true
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: "jdbc:mysql://localhost:33066/kdg"
+    username: kdg_user
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    initialization-mode: always
+#    schema: classpath:schema.sql
+#    data: classpath:data.sql
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: myuser
+    password: mypassword
+  config:
+    additional-location: ${SPRING_CONFIG_ADDITIONAL_LOCATION}
+  spring:
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+#            jwk-set-uri: http://localhost:8180/realms/kdg_realm/protocol/openid-connect/certs
+            issuer-uri: http://localhost:8180/realms/kdg_realm

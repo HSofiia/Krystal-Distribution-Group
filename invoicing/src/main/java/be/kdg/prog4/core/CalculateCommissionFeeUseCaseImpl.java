@@ -48,7 +48,7 @@ public class CalculateCommissionFeeUseCaseImpl implements CalculateCommissionFee
                 })
                 .sum();
 
-        CommissionFee fee = new CommissionFee(UUID.randomUUID(), new SellerId(event.sellerId()), new PONumber(event.poNumber()), totalFee, event.when());
+        CommissionFee fee = new CommissionFee(UUID.randomUUID(), new SellerId(event.sellerId()), new PONumber(event.poNumber()), totalFee);
         saveCommissionFeePort.save(fee);
 
         log.info("Commission fee {} recorded for PO {}", totalFee, event.poNumber());

@@ -19,12 +19,12 @@ public class OrderLineJpaEntity {
     private String uom;
 
     @Column
-    private Double amount;
+    private double amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private POJpaEntity purchaseOrder;
 
-    public OrderLineJpaEntity( Double amount, String uom, String materialType) {
+    public OrderLineJpaEntity( double amount, String uom, String materialType) {
         this.amount = amount;
         this.uom = uom;
         this.materialType = materialType;
@@ -57,11 +57,11 @@ public class OrderLineJpaEntity {
         this.uom = uom;
     }
 
-    public Double getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
     }
 

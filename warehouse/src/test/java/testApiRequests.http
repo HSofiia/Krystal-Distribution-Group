@@ -1,0 +1,32 @@
+POST http://localhost:8180/realms/kdg/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id = landside_client &
+client_secret = ToYvMNQKxFA1AXSdWZ4xIWRNVgkJ9HNV &
+username = developer &
+password = password &
+grant_type = password &
+scope = openid
+
+//saving the access token
+> {%
+    client.global.set("access_token", response.body.access_token);
+    console.log("Access Token:", client.global.get("access_token"));
+%}
+
+
+
+### Receive purchase orders and their status
+GET http://localhost:8092/bcb/purchaseOrders
+Authorization: Bearer {{access_token}}
+
+### Get warehouse info
+GET http://localhost:8092/bcb/warehouses
+Authorization: Bearer {{access_token}}
+
+### Get Warehouse By Number
+GET http://localhost:8092/bcb/warehouses/3
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{}
