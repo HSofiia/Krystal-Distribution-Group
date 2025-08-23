@@ -28,7 +28,7 @@ public class ActivityWindow {
 
     public Optional<PayloadActivity> findPendingPayloadActivity() {
         return activities.stream()
-                .filter(a -> a.activityType() == ActivityType.DELIVERY && a.amount() == 0.0)
+                .filter(a -> a.getActivityType() == ActivityType.DELIVERY && a.getAmount() == 0.0)
                 .findFirst();
     }
 
@@ -36,7 +36,7 @@ public class ActivityWindow {
         LocalDateTime snapshot = (time != null) ? time : LocalDateTime.MIN;
 
         return activities.stream()
-                .filter(a -> a.time() != null && !a.time().isBefore(snapshot)) // >= snapshot
+                .filter(a -> a.getTime() != null && !a.getTime().isBefore(snapshot)) // >= snapshot
                 .mapToDouble(PayloadActivity::getChangeToCapacity)
                 .sum();
     }
@@ -45,7 +45,7 @@ public class ActivityWindow {
         LocalDateTime snapshot = (time != null) ? time : LocalDateTime.MIN;
 
         return activities.stream()
-                .map(PayloadActivity::time)
+                .map(PayloadActivity::getTime)
                 .filter(t -> t != null && !t.isBefore(snapshot))
                 .max(LocalDateTime::compareTo);
     }

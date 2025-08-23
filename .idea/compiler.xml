@@ -15,6 +15,9 @@
       <module name="backend.common" options="-parameters" />
       <module name="backend.common.main" options="-parameters" />
       <module name="backend.common.test" options="-parameters" />
+      <module name="backend.invoicing" options="-parameters" />
+      <module name="backend.invoicing.main" options="-parameters" />
+      <module name="backend.invoicing.test" options="-parameters" />
       <module name="backend.landside" options="-parameters" />
       <module name="backend.landside.main" options="-parameters" />
       <module name="backend.landside.test" options="-parameters" />

@@ -4,3 +4,6 @@ include 'application'
 include 'common'
 include 'landside'
 include 'warehouse'
+
+include 'invoicing'
+include 'waterside'

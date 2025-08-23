@@ -11,13 +11,15 @@ public class Warehouse {
     private MaterialType materialType;
     private final WarehouseCurrentCapacity currentCapacity;
     private final ActivityWindow activities;
+    private final Seller seller;
 
-    public Warehouse(int warehouseNumber, MaterialType materialType, WarehouseCurrentCapacity currentCapacity, ActivityWindow activities
+    public Warehouse(int warehouseNumber, MaterialType materialType, WarehouseCurrentCapacity currentCapacity, ActivityWindow activities, Seller seller
     ) {
         this.warehouseNumber = warehouseNumber;
         this.materialType = materialType;
         this.currentCapacity = currentCapacity;
         this.activities = activities;
+        this.seller = seller;
     }
 
     public int getWarehouseNumber() {
@@ -42,6 +44,10 @@ public class Warehouse {
 
     public ActivityWindow getActivities() {
         return activities;
+    }
+
+    public Seller getSeller() {
+        return seller;
     }
 
     public WarehouseCurrentCapacity calculateCapacity() {

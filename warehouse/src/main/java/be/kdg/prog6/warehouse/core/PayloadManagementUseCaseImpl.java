@@ -1,6 +1,7 @@
 package be.kdg.prog6.warehouse.core;
 
 import be.kdg.prog6.common.domain.ActivityType;
+import be.kdg.prog6.common.event.ChangePayloadStorageEvent;
 import be.kdg.prog6.common.event.ChangeWarehouseCapacityEvent;
 import be.kdg.prog6.warehouse.domain.ActivityId;
 import be.kdg.prog6.warehouse.domain.PayloadActivity;
@@ -24,15 +25,17 @@ public class PayloadManagementUseCaseImpl implements PayloadManagementUseCase {
     private final SavePayloadActivityPort savePayloadPort;
     private final WarehouseProjectionPort warehouseProjection;
     private final UpdateWarehouseCapacityPort updateWarehouseCapacityPort;
+    private final UpdateInvoicingPort updateInvoicingPort;
     private final Logger logger = LoggerFactory.getLogger(PayloadManagementUseCaseImpl.class);
 
 
-    public PayloadManagementUseCaseImpl(LoadWarehousePort warehousePort, UpdatePayloadActivityPort updatePayloadPort, SavePayloadActivityPort savePayloadPort, WarehouseProjectionPort warehouseProjection, UpdateWarehouseCapacityPort updateWarehouseCapacityPort) {
+    public PayloadManagementUseCaseImpl(LoadWarehousePort warehousePort, UpdatePayloadActivityPort updatePayloadPort, SavePayloadActivityPort savePayloadPort, WarehouseProjectionPort warehouseProjection, UpdateWarehouseCapacityPort updateWarehouseCapacityPort, UpdateInvoicingPort updateInvoicingPort) {
         this.warehousePort = warehousePort;
         this.updatePayloadPort = updatePayloadPort;
         this.savePayloadPort = savePayloadPort;
         this.warehouseProjection = warehouseProjection;
         this.updateWarehouseCapacityPort = updateWarehouseCapacityPort;
+        this.updateInvoicingPort = updateInvoicingPort;
     }
 
     @Override
@@ -56,13 +59,14 @@ public class PayloadManagementUseCaseImpl implements PayloadManagementUseCase {
             savePayloadPort.savePayload(newActivity, payloadCommand.warehouseNumber());
         }
 
-        //            TODO: Invoicing here
-//        invoicingStorageRecordUpdatedPort.send(
-//                new StorageChangeEvent(
-//                        warehouse.getSeller().getSellerId().id(),
-//                        command.netWeight(),
-//                        command.sendTime(),
-//                        warehouse.getMaterialType().name()));
+        updateInvoicingPort.send(
+                new ChangePayloadStorageEvent(
+                        UUID.randomUUID(),
+                        warehouse.getSeller().getSellerId().sellerId(),
+                        warehouse.getMaterialType().name(),
+                        payloadCommand.netWeight(),
+                        payloadCommand.time()
+                ));
 
         updateWarehouseCapacityPort.updateWarehouse(warehouse);
 

@@ -2,7 +2,10 @@ package be.kdg.prog6.warehouse.adapter.out.warehouse;
 
 import be.kdg.prog6.common.domain.MaterialType;
 import be.kdg.prog6.warehouse.adapter.out.payload.PayloadActivityJpaEntity;
+import be.kdg.prog6.warehouse.adapter.out.seller.SellerJpaEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +32,10 @@ public class WarehouseJpaEntity {
 
     @OneToMany(mappedBy = "warehouse")
     private List<PayloadActivityJpaEntity> activities;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private SellerJpaEntity seller;
 
     public WarehouseJpaEntity(int warehouseNumber, double capacity, double maxCapacity, MaterialType materialType, LocalDateTime capacityReceivedTime, List<PayloadActivityJpaEntity> activities) {
         this.warehouseNumber = warehouseNumber;
@@ -88,6 +95,14 @@ public class WarehouseJpaEntity {
 
     public void setMaterialType(MaterialType materialType) {
         this.materialType = materialType;
+    }
+
+    public SellerJpaEntity getSeller() {
+        return seller;
+    }
+
+    public void setSeller(SellerJpaEntity seller) {
+        this.seller = seller;
     }
 }
 

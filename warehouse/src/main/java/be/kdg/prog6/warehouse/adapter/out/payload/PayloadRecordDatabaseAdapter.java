@@ -37,8 +37,8 @@ public class PayloadRecordDatabaseAdapter implements SavePayloadActivityPort, Up
         PayloadActivityJpaEntity payloadActivityJpaEntity = payloadRecordRepository
                 .findFirstByWarehouseAndTime(
                         warehouseNumber,
-                        payloadActivity.amount(),
-                        payloadActivity.time())
+                        payloadActivity.getAmount(),
+                        payloadActivity.getTime())
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("PayloadActivity not found"));
@@ -50,9 +50,9 @@ public class PayloadRecordDatabaseAdapter implements SavePayloadActivityPort, Up
     private PayloadActivityJpaEntity toEntity(PayloadActivity payloadActivity){
         return new PayloadActivityJpaEntity(
                 UUID.randomUUID(),
-                payloadActivity.amount(),
-                payloadActivity.time(),
-                payloadActivity.activityType()
+                payloadActivity.getAmount(),
+                payloadActivity.getTime(),
+                payloadActivity.getActivityType()
         );
     }
 }

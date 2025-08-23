@@ -1,7 +1,10 @@
 package be.kdg.prog6.warehouse.adapter.out.warehouse;
 
+import be.kdg.prog6.common.domain.MaterialType;
+import be.kdg.prog6.common.domain.SellerId;
 import be.kdg.prog6.warehouse.adapter.out.payload.PayloadActivityJpaEntity;
 import be.kdg.prog6.warehouse.adapter.out.payload.PayloadRecordJpaRepository;
+import be.kdg.prog6.warehouse.adapter.out.seller.SellerJpaEntity;
 import be.kdg.prog6.warehouse.domain.*;
 import be.kdg.prog6.warehouse.port.out.LoadWarehousePort;
 import be.kdg.prog6.warehouse.port.out.UpdateWarehouseCapacityPort;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,49 +33,33 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
 
     @Override
     public Warehouse loadWarehouseByNumberSnapshot(int warehouseNumber) {
-        WarehouseJpaEntity warehouseJpaEntity = warehouseJpaRepository.findByWarehouseNumber(warehouseNumber)
+        WarehouseJpaEntity entity = warehouseJpaRepository.findByWarehouseNumber(warehouseNumber)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Warehouse %s not found".formatted(warehouseNumber)));
+        return fromJpa(entity);
+    }
 
-        WarehouseCurrentCapacity currentCapacity = toCurrentCapacity(warehouseJpaEntity);
 
-        LocalDateTime snapshot = warehouseJpaEntity.getCapacityReceivedTime();
-        if (snapshot == null || snapshot.getYear() < 1970 || snapshot.getYear() > 9999) {
-            snapshot = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
-        }
+    @Override
+    public Warehouse loadWarehouseByOwnerIdAndMaterialType(SellerId id, MaterialType materialType){
+        return warehouseJpaRepository
+                .findBySellerIdAndMaterialType(id.sellerId(), materialType)
+                .map(this::fromJpa)
+                .orElseThrow(() -> new EntityNotFoundException("Warehouse not found"));
+    }
 
-        List<PayloadActivityJpaEntity> activityRows =
-                payloadRecordJpaRepository.findAllByTimeGreaterThanEqualAndWarehouseWarehouseNumber(
-                        snapshot,
-                        warehouseJpaEntity.getWarehouseNumber()
-                );
-
-        List<PayloadActivity> activities = activityRows.stream()
-                .map(WarehouseDatabaseAdapter::toDomainActivity)
+    @Override
+    public List<Warehouse> loadAllWarehousesSnapshot() {
+        return warehouseJpaRepository.findAll()
+                .stream()
+                .map(w -> {
+                    List<PayloadActivityJpaEntity> payloadActivities = payloadRecordJpaRepository
+                            .findAllByTimeGreaterThanEqualAndWarehouseWarehouseNumber(
+                                    w.getCapacityReceivedTime(), w.getWarehouseNumber());
+                    w.setActivities(payloadActivities);
+                    return fromJpa(w);
+                })
                 .collect(Collectors.toList());
-
-        ActivityWindow activityWindow = new ActivityWindow(warehouseJpaEntity.getWarehouseNumber(), activities);
-
-        return new Warehouse(
-                warehouseJpaEntity.getWarehouseNumber(),
-                warehouseJpaEntity.getMaterialType(),
-                currentCapacity,
-                activityWindow
-        );
-    }
-
-    private static PayloadActivity toDomainActivity(PayloadActivityJpaEntity row) {
-        ActivityId id = new ActivityId(row.getWarehouse().getWarehouseNumber(), row.getId());
-        return new PayloadActivity(
-                id,
-                row.getNetWeight(),
-                row.getTime(),
-                row.getActivityType()
-        );
-    }
-
-    private static WarehouseCurrentCapacity toCurrentCapacity(final WarehouseJpaEntity warehouseJpaEntity) {
-        return new WarehouseCurrentCapacity(warehouseJpaEntity.getCapacity(), warehouseJpaEntity.getCapacityReceivedTime());
     }
 
     @Override
@@ -79,7 +67,6 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
     public void updateWarehouse(Warehouse warehouse) {
         int number = warehouse.getWarehouseNumber();
 
-        // Reload fresh state (includes the updated net_weight)
         Warehouse fresh = loadWarehouseByNumberSnapshot(number);
 
         WarehouseCurrentCapacity currentCapacity = fresh.calculateCapacity();
@@ -93,5 +80,51 @@ public class WarehouseDatabaseAdapter implements LoadWarehousePort, UpdateWareho
 
         LOGGER.info("Updating warehouse {} with capacity {} at {}", number, currentCapacity.number(), currentCapacity.time());
         warehouseJpaRepository.save(warehouseJpaEntity);
+    }
+
+    public Warehouse fromJpa(WarehouseJpaEntity warehouseJpaEntity) {
+        WarehouseCurrentCapacity currentCapacity = new WarehouseCurrentCapacity(
+                warehouseJpaEntity.getCapacity(),
+                warehouseJpaEntity.getCapacityReceivedTime()
+        );
+
+        LocalDateTime snapshot = warehouseJpaEntity.getCapacityReceivedTime();
+        if (snapshot == null || snapshot.getYear() < 1970 || snapshot.getYear() > 9999) {
+            snapshot = LocalDateTime.of(1970, 1, 1, 0, 0, 0);
+        }
+
+        List<PayloadActivityJpaEntity> rows =
+                payloadRecordJpaRepository.findAllByTimeGreaterThanEqualAndWarehouseWarehouseNumber(
+                        snapshot,
+                        warehouseJpaEntity.getWarehouseNumber()
+                );
+
+        List<PayloadActivity> activities = rows.stream()
+                .map(row -> new PayloadActivity(
+                        new ActivityId(row.getWarehouse().getWarehouseNumber(), row.getId()),
+                        row.getNetWeight(),
+                        row.getTime(),
+                        row.getActivityType()
+                ))
+                .collect(Collectors.toList());
+
+        ActivityWindow activityWindow = new ActivityWindow(warehouseJpaEntity.getWarehouseNumber(), activities);
+
+        Seller seller = fromJpaSeller(warehouseJpaEntity.getSeller());
+
+        return new Warehouse(
+                warehouseJpaEntity.getWarehouseNumber(),
+                warehouseJpaEntity.getMaterialType(),
+                currentCapacity,
+                activityWindow,
+                seller
+        );
+    }
+
+    public static Seller fromJpaSeller(SellerJpaEntity sellerJpaEntity) {
+        if (sellerJpaEntity == null) {
+            throw new IllegalStateException("Warehouse has no seller linked");
+        }
+        return new Seller(new SellerId(sellerJpaEntity.getId()), sellerJpaEntity.getSellerName());
     }
 }

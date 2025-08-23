@@ -22,8 +22,10 @@
             <option value="$PROJECT_DIR$/application" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/invoicing" />
             <option value="$PROJECT_DIR$/landside" />
             <option value="$PROJECT_DIR$/warehouse" />
+            <option value="$PROJECT_DIR$/waterside" />
           </set>
         </option>
       </GradleProjectSettings>
