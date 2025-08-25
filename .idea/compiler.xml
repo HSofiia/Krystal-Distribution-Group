@@ -24,6 +24,9 @@
       <module name="backend.warehouse" options="-parameters" />
       <module name="backend.warehouse.main" options="-parameters" />
       <module name="backend.warehouse.test" options="-parameters" />
+      <module name="backend.waterside" options="-parameters" />
+      <module name="backend.waterside.main" options="-parameters" />
+      <module name="backend.waterside.test" options="-parameters" />
     </option>
   </component>
 </project>

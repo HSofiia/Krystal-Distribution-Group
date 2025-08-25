@@ -22,9 +22,9 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "scheduleDateTime": "2024-11-05T11:20:00",
-  "licensePlate": "KDJ378",
-  "materialType": "CEMENT"
+  "scheduleDateTime": "2024-11-05T13:20:00",
+  "licensePlate": "ADJ378",
+  "materialType": "PET_COKE"
 }
 
 ### Truck arrives at site
@@ -34,8 +34,8 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "licensePlate": "KDJ378",
-  "arrivalTime": "2024-11-05T11:25:00"
+  "licensePlate": "ADJ378",
+  "arrivalTime": "2024-11-05T13:25:00"
 }
 
 ### Weighing bridge - ENTER
@@ -45,14 +45,14 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-    "licencePlate": "KDJ378",
-    "weight": 60,
-    "time": "2024-11-05T11:26:59"
+    "licencePlate": "ADJ378",
+    "weight": 80,
+    "time": "2024-11-05T13:26:59"
 }
 
 ### Dump payload at conveyor belt (landside)
 
-POST http://localhost:8091/bca/conveyorBelt/KDJ378
+POST http://localhost:8091/bca/conveyorBelt/ADJ378
 Content-Type: application/json
 Authorization: Bearer {{access_token}}
 
@@ -65,7 +65,7 @@ Authorization: Bearer {{access_token}}
 Content-Type: application/json
 
 {
-  "licencePlate": "KDJ378",
+  "licencePlate": "ADJ378",
   "weight": 23,
-  "time": "2024-11-05T12:40:59"
+  "time": "2024-11-05T14:40:59"
 }
